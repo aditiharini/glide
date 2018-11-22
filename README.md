@@ -9,7 +9,7 @@ In progress:
 
 
 Current status:
-- can display single letters as a set of discrete points
+- can display single letters as a set of discrete points randomized around anchors
 
 
 Workflow:
