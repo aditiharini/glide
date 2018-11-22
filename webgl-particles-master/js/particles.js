@@ -6,7 +6,7 @@
  * @param {size} [size=5] particle size in pixels
  * @constructor
  */
-function Particles(canvas, nparticles, size) {
+function Particles(canvas, nparticles, shape, size) {
     var igloo = this.igloo = new Igloo(canvas),
         gl = igloo.gl,
         w = canvas.width, h = canvas.height;
@@ -27,14 +27,9 @@ function Particles(canvas, nparticles, size) {
     /* Drawing parameters. */
     this.size = size || 5;
     this.color = [0.14, 0.62, 1, 0.6];
-    this.obstacleColor = [0.45, 0.35, 0.25, 1.0];
 
     /* Simulation parameters. */
     this.running = false;
-    this.gravity = [0, -0.05];
-    this.wind = [0, 0];
-    this.restitution = 0.25;
-    this.obstacles = [];
 
     function texture() {
         return igloo.texture(null, gl.RGBA, gl.CLAMP_TO_EDGE, gl.NEAREST);
@@ -56,15 +51,13 @@ function Particles(canvas, nparticles, size) {
         p1: texture(),
         v0: texture(),
         v1: texture(),
-        obstacles: igloo.texture().blank(w, h)
     };
     this.framebuffers = {
         step: igloo.framebuffer(),
-        obstacles: igloo.framebuffer().attach(this.textures.obstacles)
     };
 
-    this.setCount(nparticles, true);
-    this.addObstacle([w / 2, h / 2], 32);
+    this.setCount(nparticles, shape, true);
+
 }
 
 /**
@@ -104,7 +97,7 @@ Particles.decode = function(pair, scale) {
  * Allocates textures and fills them with initial random state.
  * @returns {Particles} this
  */
-Particles.prototype.initTextures = function() {
+Particles.prototype.initTextures = function(shape) {
     var tw = this.statesize[0], th = this.statesize[1],
         w = this.worldsize[0], h = this.worldsize[1],
         s = this.scale,
@@ -113,10 +106,11 @@ Particles.prototype.initTextures = function() {
     for (var y = 0; y < th; y++) {
         for (var x = 0; x < tw; x++) {
             var i = y * tw * 4 + x * 4,
-                px = Particles.encode(Math.random() * w, s[0]),
-                py = Particles.encode(Math.random() * h, s[0]),
-                vx = Particles.encode(Math.random() * 1.0 - 0.5, s[1]),
-                vy = Particles.encode(Math.random() * 2.5, s[1]);
+                point_i = Math.floor(Math.random() * shape.length);
+                px = Particles.encode(shape[point_i][0] , s[0]),
+                py = Particles.encode(shape[point_i][1], s[0]),
+                vx = Particles.encode(0, s[1]),
+                vy = Particles.encode(0, s[1]);
             rgbaP[i + 0] = px[0];
             rgbaP[i + 1] = px[1];
             rgbaP[i + 2] = py[0];
@@ -159,11 +153,11 @@ Particles.prototype.initBuffers = function() {
  * @param {number} n
  * @returns {Particles} this
  */
-Particles.prototype.setCount = function(n) {
+Particles.prototype.setCount = function(n, shape) {
     var tw = Math.ceil(Math.sqrt(n)),
         th = Math.floor(Math.sqrt(n));
     this.statesize = new Float32Array([tw, th]);
-    this.initTextures();
+    this.initTextures(shape);
     this.initBuffers();
     return this;
 };
@@ -211,55 +205,7 @@ Particles.prototype.swap = function() {
     return this;
 };
 
-/**
- * Brings the obstacles texture up to date.
- * @returns {Particles} this
- */
-Particles.prototype.updateObstacles = function() {
-    var gl = this.igloo.gl;
-    this.framebuffers.obstacles.bind();
-    gl.disable(gl.BLEND);
-    gl.viewport(0, 0, this.worldsize[0], this.worldsize[1]);
-    gl.clearColor(0.5, 0.5, 0, 1);
-    gl.clear(gl.COLOR_BUFFER_BIT);
-    for (var i = 0; i < this.obstacles.length; i++) {
-        var obstacle = this.obstacles[i];
-        if (obstacle.enabled) {
-            obstacle.program.use()
-                .attrib('vert', obstacle.verts, 2)
-                .uniform('position', new Float32Array(obstacle.position))
-                .uniform('worldsize', this.worldsize)
-                .uniform('size', obstacle.size)
-                .draw(obstacle.mode, obstacle.length);
-        }
-    }
-    return this;
-};
 
-/**
- * Introduces a new circle obstacle to the simulation. You can
- * continue to update the obstacle position, radius, etc. so long as
- * you call updateObstacles() afterwards.
- * @param {Array} center
- * @param {number} radius
- * @returns {Object} the obstacle object
- */
-Particles.prototype.addObstacle = function(center, radius) {
-    var igloo = this.igloo, gl = igloo.gl,
-        w = this.worldsize[0], h = this.worldsize[1];
-    var obstacle = {
-        enabled: true,
-        program: this.programs.ocircle,
-        verts: this.buffers.point,
-        position: center,
-        size: radius,
-        mode: gl.POINTS,
-        length: 1
-    };
-    this.obstacles.push(obstacle);
-    this.updateObstacles();
-    return obstacle;
-};
 
 /**
  * Step the simulation forward by one iteration.
@@ -271,18 +217,13 @@ Particles.prototype.step = function() {
     this.framebuffers.step.attach(this.textures.p1);
     this.textures.p0.bind(0);
     this.textures.v0.bind(1);
-    this.textures.obstacles.bind(2);
     gl.viewport(0, 0, this.statesize[0], this.statesize[1]);
     this.programs.update.use()
         .attrib('quad', this.buffers.quad, 2)
         .uniformi('position', 0)
         .uniformi('velocity', 1)
-        .uniformi('obstacles', 2)
         .uniform('scale', this.scale)
         .uniform('random', Math.random() * 2.0 - 1.0)
-        .uniform('gravity', this.gravity)
-        .uniform('wind', this.wind)
-        .uniform('restitution', this.restitution)
         .uniform('worldsize', this.worldsize)
         .uniformi('derivative', 0)
         .draw(gl.TRIANGLE_STRIP, Igloo.QUAD2.length / 2);
@@ -319,11 +260,9 @@ Particles.prototype.draw = function() {
         .uniform('scale', this.scale)
         .uniform('color', this.color)
         .draw(gl.POINTS, this.statesize[0] * this.statesize[1]);
-    this.textures.obstacles.bind(2);
     this.programs.flat.use()
         .attrib('quad', this.buffers.quad, 2)
         .uniformi('background', 2)
-        .uniform('color', this.obstacleColor)
         .uniform('worldsize', this.worldsize)
         .draw(gl.TRIANGLE_STRIP, Igloo.QUAD2.length / 2);
     return this;

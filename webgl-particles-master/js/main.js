@@ -22,7 +22,8 @@ function updateCount() {
 
 $(document).ready(function() {
     var canvas = $('#display')[0];
-    particles = new Particles(canvas, 1024 * 16, 3).draw().start();
+    letter = [[75, 50], [100, 50], [125, 50], [100, 100], [100, 150], [75, 150], [125, 150]];
+    particles = new Particles(canvas, 20, letter, 3).draw().start();
     controller = new Controller(particles);
     new FPS(particles);
     updateCount();
