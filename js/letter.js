@@ -10,6 +10,11 @@ Letter.prototype.getRandomPoint = function() {
     return this.points[Math.floor(Math.random() * this.numPoints())];
 };
 
+Letter.prototype.getRandomPointWithJittering = function() {
+    var random_point = this.getRandomPoint();
+    return [random_point[0] + (Math.random() * 50 - 5), random_point[1] + (Math.random() * 50 - 5)];
+}
+
 Letter.prototype.scaled = function(factor) {
     scaled_points = [];
     this.points.forEach(element => {
