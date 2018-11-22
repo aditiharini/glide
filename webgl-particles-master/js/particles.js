@@ -56,7 +56,7 @@ function Particles(canvas, nparticles, shape, size) {
         step: igloo.framebuffer(),
     };
 
-    this.setCount(nparticles, shape, true);
+    this.setCount(nparticles, shape.translated(Math.floor(this.worldsize[0]/2), Math.floor(this.worldsize[1]/2)), true);
 
 }
 
@@ -105,10 +105,10 @@ Particles.prototype.initTextures = function(shape) {
         rgbaV = new Uint8Array(tw * th * 4);
     for (var y = 0; y < th; y++) {
         for (var x = 0; x < tw; x++) {
+            var randomPoint = shape.getRandomPoint();
             var i = y * tw * 4 + x * 4,
-                point_i = Math.floor(Math.random() * shape.length);
-                px = Particles.encode(shape[point_i][0] , s[0]),
-                py = Particles.encode(shape[point_i][1], s[0]),
+                px = Particles.encode(randomPoint[0] , s[0]),
+                py = Particles.encode(randomPoint[1], s[0]),
                 vx = Particles.encode(0, s[1]),
                 vy = Particles.encode(0, s[1]);
             rgbaP[i + 0] = px[0];
