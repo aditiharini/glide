@@ -1,6 +1,18 @@
-# WebGL Particle System Demo
+# glide
+TODO: 
+- Develop abstractions for defining letters with discrete sets of points
+- Test discrete algorithms
+- Interpolate discrete points to create continuout distribution
 
-* [Online Demo](http://skeeto.github.io/webgl-particles/)
-* [A GPU Approach to Particle Physics](http://nullprogram.com/blog/2014/06/29/)
+In progress:
+- displaying multiple letters as sets of discrete points
 
-![](http://i.imgur.com/4oj0CGP.png)
+
+Current status:
+- can display single letters as a set of discrete points
+
+
+Workflow:
+- make a PR to group related changes together
+- if changes are small, self-approve and merge
+- if changes are significant, wait for approval
