@@ -6,31 +6,22 @@
  */
 function Controller(particles) {
     this.particles = particles;
-    this.obstacle = null;
     this.init();
     this.mousedown = false;
 
     var _this = this,
         canvas = particles.igloo.gl.canvas;
     $(canvas).on('mousemove', function(event) {
-        var coords = Controller.coords(event);
-        _this.obstacle.position[0] = coords[0];
-        _this.obstacle.position[1] = coords[1];
-        _this.obstacle.enabled = true;
-        particles.updateObstacles();
-        if (_this.mousedown) _this.place();
+        // TODO(aditi): define event
     });
     $(canvas).on('mouseout', function() {
-        _this.obstacle.enabled = false;
-        particles.updateObstacles();
-        _this.mousedown = false;
+        // TODO(aditi): define event
     });
     $(canvas).on('mousedown', function() {
-        _this.mousedown = true;
+        // TODO(aditi): define event
     });
     $(canvas).on('mouseup', function(event) {
-        if (event.which === 1) _this.place();
-        _this.mousedown = false;
+        // TODO(aditi): define event
     });
     $(window).on('keyup', function(event) {
         switch (event.which) {
@@ -62,25 +53,8 @@ function Controller(particles) {
         psize: $('.controls .particles .size').on('input', function() {
             _this.particles.size = Number($(this).val());
         }),
-        gravity: $('.controls .particles .gravity').on('input', function() {
-            _this.particles.gravity[1] = -Number($(this).val());
-        }),
-        wind: $('.controls .particles .wind').on('input', function() {
-            _this.particles.wind[0] = Number($(this).val());
-        }),
-        restitution: $('.controls .restitution').on('input', function() {
-            _this.particles.restitution = Number($(this).val());
-        }),
-        ocolor: $('.controls .obstacles .color').on('change', function(event) {
-            var value = $(event.target).val();
-            _this.particles.obstacleColor = Controller.parseColor(value);
-        }),
         clear: $('.controls .clear').on('click', function() {
             _this.clear();
-        }),
-        osize: $('.controls .obstacles .size').on('change', function() {
-            _this.obstacle.size = Number($(this).val());
-            _this.particles.updateObstacles();
         }),
         save: $('.controls .save').on('click', function() {
             localStorage.snapshot = JSON.stringify(_this.save());
@@ -97,33 +71,7 @@ function Controller(particles) {
  * @returns {Controller} this
  */
 Controller.prototype.init = function() {
-    this.obstacle = this.particles.addObstacle([0, 0], 20);
-    this.obstacle.enabled = false;
-    this.particles.updateObstacles();
-    return this;
-};
-
-/**
- * Place a new obstacle at the mouse location.
- * @returns {Controller} this
- */
-Controller.prototype.place = function() {
-    var center = this.obstacle.position,
-        radius = this.obstacle.size;
-    this.particles.addObstacle(center.slice(0), radius);
-    this.particles.updateObstacles();
-    return this;
-};
-
-/**
- * Clear all obstacles.
- * @returns {Controller} this
- */
-Controller.prototype.clear = function() {
-    var size = this.obstacle.size;
-    this.particles.obstacles.length = 0;
-    this.init();
-    this.obstacle.size = size;
+    // TODO(aditi): set initial state 
     return this;
 };
 
@@ -144,21 +92,9 @@ Controller.prototype.adjust = function(factor) {
  */
 Controller.prototype.save = function() {
     var save = {
-        gravity: this.particles.gravity,
-        wind: this.particles.wind,
         size: this.particles.size,
-        restitution: this.particles.restitution,
         particles: this.particles.getCount(),
-        obstacles: []
     };
-    this.particles.obstacles.forEach(function(o) {
-        if (o.enabled) {
-            save.obstacles.push({
-                position: Controller.round(o.position),
-                size: o.size
-            });
-        }
-    });
     return save;
 };
 
@@ -174,12 +110,6 @@ Controller.prototype.restore = function(save) {
     this.clear();
     var ps = this.particles;
     this.controls.psize.val(ps.size = save.size);
-    this.controls.gravity.val(ps.gravity = save.gravity);
-    this.controls.wind.val(ps.wind = save.wind);
-    this.controls.restitution.val(ps.restitution = save.restitution);
-    save.obstacles.forEach(function(o) {
-        ps.addObstacle(o.position, o.size);
-    });
     return this;
 };
 
