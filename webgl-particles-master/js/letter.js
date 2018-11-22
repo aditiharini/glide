@@ -10,6 +10,14 @@ Letter.prototype.getRandomPoint = function() {
     return this.points[Math.floor(Math.random() * this.numPoints())];
 };
 
+Letter.prototype.scaled = function(factor) {
+    scaled_points = [];
+    this.points.forEach(element => {
+        scaled_points.push([element[0] * factor, element[1] * factor]);
+    })
+    return new Letter(scaled_points);
+}
+
 Letter.prototype.translated = function(deltaX, deltaY) {
     translated_points = []
     this.points.forEach(element => {
