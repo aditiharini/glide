@@ -5,11 +5,11 @@ TODO:
 - Interpolate discrete points to create continuout distribution
 
 In progress:
-- displaying multiple letters as sets of discrete points
+- keeping dots in a particualar shape for each letter
 
 
 Current status:
-- can display single letters as a set of discrete points randomized around anchors
+- can display multiple letters as a set of discrete points randomized around anchors
 
 
 Workflow:
