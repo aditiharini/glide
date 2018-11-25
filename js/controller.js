@@ -71,7 +71,7 @@ function Controller(particles) {
  * @returns {Controller} this
  */
 Controller.prototype.init = function() {
-    // TODO(aditi): set initial state 
+    // TODO(aditi): set initial state
     return this;
 };
 
