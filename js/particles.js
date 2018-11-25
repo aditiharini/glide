@@ -6,7 +6,7 @@
  * @param {size} [size=5] particle size in pixels
  * @constructor
  */
-function Particles(canvas, nparticles, shape, size) {
+function Particles(canvas, nparticles, shapes, size) {
     var igloo = this.igloo = new Igloo(canvas),
         gl = igloo.gl,
         w = canvas.width, h = canvas.height;
@@ -56,7 +56,7 @@ function Particles(canvas, nparticles, shape, size) {
         step: igloo.framebuffer(),
     };
 
-    this.setCount(nparticles, shape.translated(Math.floor(this.worldsize[0]/2), Math.floor(this.worldsize[1]/2)), true);
+    this.setCount(nparticles, shapes, true);
 
 }
 
@@ -97,7 +97,7 @@ Particles.decode = function(pair, scale) {
  * Allocates textures and fills them with initial random state.
  * @returns {Particles} this
  */
-Particles.prototype.initTextures = function(shape) {
+Particles.prototype.initTextures = function(shapes) {
     var tw = this.statesize[0], th = this.statesize[1],
         w = this.worldsize[0], h = this.worldsize[1],
         s = this.scale,
@@ -105,7 +105,7 @@ Particles.prototype.initTextures = function(shape) {
         rgbaV = new Uint8Array(tw * th * 4);
     for (var y = 0; y < th; y++) {
         for (var x = 0; x < tw; x++) {
-            var randomPoint = shape.getRandomPointWithJittering();
+            var randomPoint = shapes[(x) % shapes.length].getRandomPointWithJittering();
             var i = y * tw * 4 + x * 4,
                 px = Particles.encode(randomPoint[0] , s[0]),
                 py = Particles.encode(randomPoint[1], s[0]),
@@ -153,11 +153,11 @@ Particles.prototype.initBuffers = function() {
  * @param {number} n
  * @returns {Particles} this
  */
-Particles.prototype.setCount = function(n, shape) {
+Particles.prototype.setCount = function(n, shapes) {
     var tw = Math.ceil(Math.sqrt(n)),
         th = Math.floor(Math.sqrt(n));
     this.statesize = new Float32Array([tw, th]);
-    this.initTextures(shape);
+    this.initTextures(shapes);
     this.initBuffers();
     return this;
 };
