@@ -12,7 +12,7 @@ Letter.prototype.getRandomPoint = function() {
 
 Letter.prototype.getRandomPointWithJittering = function() {
     var random_point = this.getRandomPoint();
-    return [random_point[0] + (Math.random() * 100 - 50), random_point[1] + (Math.random() * 100 - 50)];
+    return [random_point[0] + (Math.random() * 50 - 25), random_point[1] + (Math.random() * 50 - 25)];
 }
 
 Letter.prototype.scaled = function(factor) {

@@ -28,7 +28,8 @@ var alphabet = {
 $(document).ready(function() {
     var canvas = $('#display')[0];
     // Need to make sure anchor points are somewhat evenly spaced
-    particles = new Particles(canvas, 1024, alphabet.A.scaled(2), 3).draw().start();
+    letters = [alphabet.A.translated(50, 100).scaled(3), alphabet.I.translated(200, 100).scaled(2)]
+    particles = new Particles(canvas, 1024 * letters.length, letters, 3).draw().start();
     controller = new Controller(particles);
     new FPS(particles);
     updateCount();
