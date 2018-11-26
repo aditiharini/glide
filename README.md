@@ -4,12 +4,14 @@ TODO:
 - Test discrete algorithms
 - Interpolate discrete points to create continuout distribution
 
-In progress:
-- keeping dots in a particualar shape for each letter
+In progress
+- animating particles to move from one location to another
 
 
 Current status:
 - can display multiple letters as a set of discrete points randomized around anchors
+- dynamically enter text
+- display letters in proper, curved shapes
 
 
 Workflow:
