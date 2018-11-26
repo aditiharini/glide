@@ -56,7 +56,12 @@ function Particles(canvas, nparticles, shapes, size) {
         step: igloo.framebuffer(),
     };
 
-    this.setCount(nparticles, shapes, true);
+    var tw = Math.ceil(Math.sqrt(nparticles)),
+    th = Math.floor(Math.sqrt(nparticles));
+    this.statesize = new Float32Array([tw, th]);
+    this.letters = shapes;
+    this.initTextures(shapes);
+    this.initBuffers();
 
 }
 
@@ -97,13 +102,17 @@ Particles.decode = function(pair, scale) {
  * Allocates textures and fills them with initial random state.
  * @returns {Particles} this
  */
-Particles.prototype.initTextures = function(shapes) {
+Particles.prototype.initTextures = function(letters) {
+    if (!letters) {
+        return this;
+    }
+    console.log("has textures");
     var tw = this.statesize[0], th = this.statesize[1],
         w = this.worldsize[0], h = this.worldsize[1],
         s = this.scale,
         rgbaP = new Uint8Array(tw * th * 4),
         rgbaV = new Uint8Array(tw * th * 4);
-    var randomPoints = THREE.GeometryUtils.randomPointsInGeometry(shapes, th*tw)
+    var randomPoints = letters.samplePoints(th*tw);
     for (var y = 0; y < th; y++) {
         for (var x = 0; x < tw; x++) {
             var randomPoint = randomPoints[y * tw + x];
@@ -154,15 +163,22 @@ Particles.prototype.initBuffers = function() {
  * @param {number} n
  * @returns {Particles} this
  */
-Particles.prototype.setCount = function(n, shapes) {
+Particles.prototype.setCount = function(n) {
     var tw = Math.ceil(Math.sqrt(n)),
         th = Math.floor(Math.sqrt(n));
     this.statesize = new Float32Array([tw, th]);
-    this.initTextures(shapes);
+    this.initTextures(this.letters);
     this.initBuffers();
     return this;
 };
 
+Particles.prototype.setText = function(newLetters) {
+    this.letters = newLetters;
+    this.initTextures(newLetters);
+    this.initBuffers();
+    this.draw();
+    return this;
+}
 /**
  * @returns {number} the actual particle count
  */

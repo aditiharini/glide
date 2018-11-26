@@ -1,32 +1,46 @@
-function Letter(points){
-    this.points = points;
+function Letters(text, font){
+    console.log(text);
+    this.shape = new THREE.TextGeometry(text, {
+        font: font 
+    });
 };
 
-Letter.prototype.numPoints = function() {
-    return this.points.length; 
-};
-
-Letter.prototype.getRandomPoint = function() {
-    return this.points[Math.floor(Math.random() * this.numPoints())];
-};
-
-Letter.prototype.getRandomPointWithJittering = function() {
-    var random_point = this.getRandomPoint();
-    return [random_point[0] + (Math.random() * 50 - 25), random_point[1] + (Math.random() * 50 - 25)];
+Letters.prototype.getWidth = function() {
+    this.shape.computeBoundingBox();
+    var bounds = this.shape.boundingBox; 
+    return bounds.max.x - bounds.min.x
 }
 
-Letter.prototype.scaled = function(factor) {
-    scaled_points = [];
-    this.points.forEach(element => {
-        scaled_points.push([element[0] * factor, element[1] * factor]);
-    })
-    return new Letter(scaled_points);
+Letters.prototype.getHeight = function() {
+    this.shape.computeBoundingBox();
+    var bounds = this.shape.boundingBox;  
+    return bounds.max.y - bounds.min.y
 }
 
-Letter.prototype.translated = function(deltaX, deltaY) {
-    translated_points = []
-    this.points.forEach(element => {
-        translated_points.push([element[0] + deltaX, element[1] + deltaY]);
-    }); 
-    return new Letter(translated_points);
-};
+Letters.prototype.samplePoints = function(numPoints) {
+    console.log(this.shape);
+    return THREE.GeometryUtils.randomPointsInGeometry(this.shape, numPoints)
+}
+
+Letters.prototype.scale = function (factor) {
+    this.shape.applyMatrix(new THREE.Matrix4().makeScale(
+        factor,
+        factor, 
+        1
+    )); 
+}
+
+Letters.prototype.scaleToFit = function (width, height) {
+    var lettersWidth = this.getWidth()
+    if (lettersWidth > width) {
+        var scaleFactor = width / lettersWidth;
+        this.scale(scaleFactor);
+    } 
+}
+
+Letters.prototype.translate = function (deltaX, deltaY) {
+    this.shape.applyMatrix( new THREE.Matrix4().makeTranslation(
+        deltaX,
+        deltaY,
+        0));
+}
