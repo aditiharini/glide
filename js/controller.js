@@ -62,6 +62,12 @@ function Controller(particles) {
         restore: $('.controls .restore').on('click', function() {
             _this.restore(JSON.parse(localStorage.snapshot));
             updateCount();
+        }),
+        text: $('.controls .text').on('keyup', function() {
+            var newText = $(this).val();
+            if (newText != ""){
+                _this.changeText(newText);
+            }
         })
     };
 }
@@ -74,6 +80,22 @@ Controller.prototype.init = function() {
     // TODO(aditi): set initial state
     return this;
 };
+
+Controller.prototype.changeText = function(newText) {
+    var canvasWidth = this.particles.worldsize[0];
+    var canvasHeight = this.particles.worldsize[1];
+    var loader = new THREE.FontLoader();
+    loader.load(
+        '../fonts/helvetiker_bold.typeface.json',
+        function ( font ) {
+            console.log(newText);
+            var letters = new Letters(newText, font); 
+            letters.scaleToFit(canvasWidth, canvasHeight);
+            letters.translate((canvasWidth - letters.getWidth()) * 0.5, (canvasHeight - letters.getHeight()) * 0.5);
+            this.particles.setText(letters);
+        }
+    );
+}
 
 /**
  * Immediately adjust the particle count.

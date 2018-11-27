@@ -20,8 +20,7 @@ function comma(num) {
 }
 
 var particles = null,
-    controller = null,
-    letter = null;
+    controller = null;
 
 function updateCount() {
     var count = particles.statesize[0] * particles.statesize[1];
@@ -30,11 +29,7 @@ function updateCount() {
 
 $(document).ready(function() {
     var canvas = $('#display')[0];
-    // Need to make sure anchor points are somewhat evenly spaced
-
-    particles = new Particles(canvas, 1024, alphabet.I.scaled(2), 3).draw().start();
+    particles = new Particles(canvas, 1024, null, 3).draw().start();
     controller = new Controller(particles);
     new FPS(particles);
-    updateCount();
-
 });
