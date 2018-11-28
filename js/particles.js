@@ -320,6 +320,20 @@ Particles.prototype.frame = function() {
     return this;
 };
 
+// TODO:  Include main loop in rendering  particles
+// TODO: merge with above frame function()
+
+// // Main loop for rendering particles
+// function loop() {
+// 	window.requestAnimFrame(loop);
+// 	createParticles();
+// 	updateParticles();
+// 	killParticles();
+// 	drawParticles();
+// }
+// window.requestAnimFrame(loop);
+
+
 // TODO: possibly merge this with Particles.prototype.frame
 window.requestAnimFrame = (function(){
   return  window.requestAnimationFrame       ||
