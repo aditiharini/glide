@@ -56,6 +56,8 @@ function Particles(canvas, nparticles, shapes, size) {
         step: igloo.framebuffer(),
     };
 
+    this.ps = [];
+
     var tw = Math.ceil(Math.sqrt(nparticles)),
     th = Math.floor(Math.sqrt(nparticles));
     this.statesize = new Float32Array([tw, th]);
@@ -98,6 +100,17 @@ Particles.decode = function(pair, scale) {
              (pair[1] / 255) * b * b) - b * b / 2) / scale;
 };
 
+Particles.prototype.insertParticle = function(p, v) {
+  this.ps.push({
+          x: p[0],
+          y: p[1],
+          speed: v[0],
+          radius: 5+Math.random()*5, //between 5 and 10
+          base_radius: Math.random() * 20,
+          color: "white",
+  })
+};
+
 /**
  * Allocates textures and fills them with initial random state.
  * @returns {Particles} this
@@ -106,7 +119,6 @@ Particles.prototype.initTextures = function(letters) {
     if (!letters) {
         return this;
     }
-    console.log("has textures");
     var tw = this.statesize[0], th = this.statesize[1],
         w = this.worldsize[0], h = this.worldsize[1],
         s = this.scale,
@@ -131,6 +143,7 @@ Particles.prototype.initTextures = function(letters) {
             rgbaV[i + 3] = vy[1];
         }
     }
+
     this.textures.p0.set(rgbaP, tw, th);
     this.textures.v0.set(rgbaV, tw, th);
     this.textures.p1.blank(tw, th);
@@ -175,6 +188,10 @@ Particles.prototype.setCount = function(n) {
 Particles.prototype.setText = function(newLetters) {
     this.letters = newLetters;
     this.initTextures(newLetters);
+    console.log('NEW LETTERS');
+    console.log(newLetters);
+
+    // TODO replace draw function (see order in main.js)
     this.initBuffers();
     this.draw();
     return this;
