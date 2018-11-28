@@ -31,37 +31,6 @@ function updateCount() {
     $('.count').text(comma(count));
 }
 
-function applyDynamics(particles) {
-// particles.letters.vertices = array of point positions
-// TODO insert optimal transport algorithm here
-  for (var i in particles)  {
-    var particle = particles[i];
-    particle.x += Math.random();
-    particle.y += Math.random();
-  }
-}
-
-function killParticles() {
-	for (var i in particles) {
-		var particle = particles[i];
-		if (particle.y > canvas.height) {
-			particle.y = 0
-		}
-	}
-}
-
-function drawParticles() {
-  c.fillStyle = "black";
-  c.fillRect(0,0,canvas.width,canvas.height);
-  for(var i in particles) {
-      var part = particles[i];
-      c.beginPath();
-      c.arc(part.x,part.y, part.radius, 0, Math.PI*2);
-      c.closePath();
-      c.fillStyle = part.color;
-      c.fill();
-  }
-}
 
 
 $(document).ready(function() {

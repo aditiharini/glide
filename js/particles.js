@@ -11,6 +11,7 @@ function Particles(canvas, nparticles, shapes, size) {
         gl = igloo.gl,
         w = canvas.width, h = canvas.height;
     gl.disable(gl.DEPTH_TEST);
+    this.canvas = canvas;
     this.worldsize = new Float32Array([w, h]);
     var scale = Math.floor(Math.pow(Particles.BASE, 2) / Math.max(w, h) / 3);
     this.scale = [scale, scale * 100];
@@ -309,7 +310,8 @@ Particles.prototype.draw = function() {
 Particles.prototype.frame = function() {
     window.requestAnimationFrame(function() {
         if (this.running) {
-            this.step().draw().frame();
+          // TODO: fully remove below step()....
+            // this.step().draw().frame();
             for (var i = 0; i < this.listeners.length; i++) {
                 this.listeners[i]();
             }
@@ -317,6 +319,19 @@ Particles.prototype.frame = function() {
     }.bind(this));
     return this;
 };
+
+// TODO: possibly merge this with Particles.prototype.frame
+window.requestAnimFrame = (function(){
+  return  window.requestAnimationFrame       ||
+          window.webkitRequestAnimationFrame ||
+          window.mozRequestAnimationFrame    ||
+          window.oRequestAnimationFrame      ||
+          window.msRequestAnimationFrame     ||
+          function( callback ){
+            window.setTimeout(callback, 1000 / 60);
+          };
+})();
+
 
 /**
  * Start animating the simulation if it isn't already.
@@ -338,3 +353,42 @@ Particles.prototype.stop = function() {
     this.running = false;
     return this;
 };
+
+
+Particles.prototype.applyDynamics = function() {
+  // particles.letters.vertices = array of point positions
+  // TODO insert optimal transport algorithm here
+  particles = this.particles.letters.vertices;
+  for (var i in particles)  {
+    var particle = particles[i];
+    particle.x += Math.random();
+    particle.y += Math.random();
+  }
+  // TODO: remove this I think
+  this.particles.letters.vertices = particles;
+}
+
+Particles.prototype.killParticles = function() {
+  particles = this.particles.letters.vertices;
+	for (var i in particles) {
+		var particle = particles[i];
+		if (particle.y > canvas.height) {
+			particle.y = 0
+		}
+	}
+}
+
+Particles.prototype.drawParticles = function() {
+
+  this.canvas.fillStyle = "black";
+  this.canvas.fillRect(0,0,this.canvas.width,this.canvas.height);
+  particles = this.particles.letters.vertices;
+  for(var i in particles) {
+      var part = particles[i];
+      this.canvas.beginPath();
+      this.canvas.arc(part.x,part.y, part.radius, 0, Math.PI*2);
+      this.canvas.closePath();
+      this.canvas.fillStyle = part.color;
+      this.canvas.fill();
+  }
+}
