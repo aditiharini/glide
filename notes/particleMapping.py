@@ -44,8 +44,6 @@ start = generatePoints(n, mu=5)
 end = generatePoints(m)
 res = start
 costs =  generateCosts(start,end,costs)
-plt.plot(start.transpose()[0], start.transpose()[1],'ro')
-plt.plot(end.transpose()[0], end.transpose()[1], 'bo')
 costs =  generateCosts(res,end,costs)
 t = np.exp(-costs * a)
 G = sinkhorn(t)
@@ -57,6 +55,9 @@ thr =1e-8
 mx = G.max()
 
 # Plotting mapping
+plt.figure(1)
+plt.plot(start.transpose()[0], start.transpose()[1],'ro')
+plt.plot(end.transpose()[0], end.transpose()[1], 'bo')
 print("G {}".format(G))
 for i in range(xs.shape[0]):
     for j in range(xt.shape[0]):
@@ -65,5 +66,8 @@ for i in range(xs.shape[0]):
 			print("alpha {}, G ij {} ".format(G[i, j] / mx, G[i,j]))
 			# plt.plot([xs[i, 0], xt[j, 0]], [xs[i, 1], xt[j, 1]], alpha=G[i, j] / mx)
 			plt.plot([xs[i, 0], xt[j, 0]], [xs[i, 1], xt[j, 1]], alpha=G[i, j])
+
+plt.figure(2)
+plt.imshow(G, interpolation='nearest') # mapping gamma weights
 
 plt.show()
