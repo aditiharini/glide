@@ -11,62 +11,69 @@ def generateCosts(d1,d2, m):
 	return m
 
 # init
-# m, n = 5,6
-# iters = 1
-# a = 0.05
-# scale = 1.0 /(float(m)*float(n))
-# costs = np.zeros((n,m))
-
-# # start and end distribution
-# start = generatePoints(n, mu=5)
-# end = generatePoints(m)
-# res = start
-# costs =  generateCosts(start,end,costs)
-# plt.plot(start.transpose()[0], start.transpose()[1],'ro')
-# plt.plot(end.transpose()[0], end.transpose()[1], 'bo')
-
-
-# costs = scale * generateCosts(res,end,costs)
-# # t = scale * np.exp(-costs * a)
-# t = np.exp(-costs*a)
-# res = t.dot(end)
-# print(t, res)
-# plt.plot(res.transpose()[0], res.transpose()[1], 'go',alpha=1)
-
-
-# # for i in range(iters): 
-# # 	alpha = float(i+1)/iters
-# # 	costs =  generateCosts(res,end,costs)
-# # 	t = scale * np.exp(costs * (i+1))
-# # 	res = t.dot(end)
-# # 	plt.plot(res.transpose()[0], res.transpose()[1], 'go',alpha=alpha)
-# # 	# start = res
-
-
-# plt.show()
-
-
-
-##### find min cost point to point mapping ####
-
-m, n = 3, 3
-iters = 1
+m, n = 5,3
+iters = 3
 a = 0.05
 scale = 1.0 /(float(m)*float(n))
 costs = np.zeros((n,m))
 
-
+# start and end distribution
 start = generatePoints(n, mu=5)
 end = generatePoints(m)
 res = start
 costs =  generateCosts(start,end,costs)
-print(np.argmin(np.array(costs), axis=1), np.array(costs))
 plt.plot(start.transpose()[0], start.transpose()[1],'ro')
 plt.plot(end.transpose()[0], end.transpose()[1], 'bo')
 
+
+costs =  generateCosts(res,end,costs)
+t = np.exp(-costs * a)
+
+def sinkhorn(t):
+	scale_row = True
+	err = 1.0
+	i = 0
+	timeout = 100
+	stopThres = 1e-9
+	while (abs(err) > stopThres and i < timeout):
+		i+=1
+		if scale_row:
+			sums = np.sum(t, axis=1)
+			err = np.sum(sums) - m
+			scalar = 1.0/sums
+			t = (t.transpose() * scalar).transpose()
+			print(t)
+			print("new sum {} by rows".format(np.sum(t, axis=1)))
+			scale_row = not scale_row
+		else:
+			sums = np.sum(t, axis=0)
+			err = np.sum(sums) - n
+			scalar = 1.0/sums
+			t =  t * scalar.transpose()
+			scale_row =  not scale_row
+			print(t)
+			print("new sum {} by cols".format(np.sum(t, axis=0)))
+		print("matrix: {}, error {}".format(t, err))
+	return t
+
+
+G = sinkhorn(t)
+print("G {}".format(G))
+
+
+# color 
+xs = start
+xt = end
+thr =1e-8
+mx = G.max()
+print("max: {}".format(mx))
+for i in range(xs.shape[0]):
+    for j in range(xt.shape[0]):
+        if G[i, j] / mx > thr:
+			print("{} {}".format([xs[i, 0], xt[j, 0]], [xs[i, 1], xt[j, 1]] ))
+			print("alpha {}, G ij {} ".format(G[i, j] / mx, G[i,j]))
+			# plt.plot([xs[i, 0], xt[j, 0]], [xs[i, 1], xt[j, 1]], alpha=G[i, j] / mx)
+			plt.plot([xs[i, 0], xt[j, 0]], [xs[i, 1], xt[j, 1]], alpha=G[i, j])
+
+
 plt.show()
-
-
-
-
-
