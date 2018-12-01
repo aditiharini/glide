@@ -29,12 +29,7 @@ plt.plot(end.transpose()[0], end.transpose()[1], 'bo')
 costs =  generateCosts(res,end,costs)
 t = np.exp(-costs * a)
 
-def sinkhorn(t):
-	scale_row = True
-	err = 1.0
-	i = 0
-	timeout = 100
-	stopThres = 1e-9
+def sinkhorn(t, scale_row=True, err=1.0, i=0, timeout=100, stopThres=1e-9):
 	while (abs(err) > stopThres and i < timeout):
 		i+=1
 		if scale_row:
