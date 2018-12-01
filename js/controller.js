@@ -9,33 +9,8 @@ function Controller(particles) {
     this.init();
     this.mousedown = false;
 
-    var _this = this,
-        canvas = particles.igloo.gl.canvas;
-    $(canvas).on('mousemove', function(event) {
-        // TODO(aditi): define event
-    });
-    $(canvas).on('mouseout', function() {
-        // TODO(aditi): define event
-    });
-    $(canvas).on('mousedown', function() {
-        // TODO(aditi): define event
-    });
-    $(canvas).on('mouseup', function(event) {
-        // TODO(aditi): define event
-    });
-    $(window).on('keyup', function(event) {
-        switch (event.which) {
-        case 67: // c
-            _this.clear();
-            break;
-        case 68: // d
-            _this.adjust(2);
-            break;
-        case 72: // h
-            _this.adjust(0.5);
-            break;
-        }
-    });
+    var _this = this;
+
     this.controls = {
         increase: $('.controls .increase').on('click', function() {
             _this.adjust(2);
@@ -56,13 +31,6 @@ function Controller(particles) {
         clear: $('.controls .clear').on('click', function() {
             _this.clear();
         }),
-        save: $('.controls .save').on('click', function() {
-            localStorage.snapshot = JSON.stringify(_this.save());
-        }),
-        restore: $('.controls .restore').on('click', function() {
-            _this.restore(JSON.parse(localStorage.snapshot));
-            updateCount();
-        }),
         text: $('.controls .text').on('keyup', function() {
             var newText = $(this).val();
             if (newText != ""){
@@ -82,16 +50,17 @@ Controller.prototype.init = function() {
 };
 
 Controller.prototype.changeText = function(newText) {
-    var canvasWidth = this.particles.worldsize[0];
-    var canvasHeight = this.particles.worldsize[1];
     var loader = new THREE.FontLoader();
     loader.load(
         '../fonts/helvetiker_bold.typeface.json',
         function ( font ) {
             console.log(newText);
             var letters = new Letters(newText, font); 
+            var canvasWidth = this.particles.getWidth();
+            var canvasHeight = this.particles.getHeight();
             letters.scaleToFit(canvasWidth, canvasHeight);
-            letters.translate((canvasWidth - letters.getWidth()) * 0.5, (canvasHeight - letters.getHeight()) * 0.5);
+            letters.translate(-letters.getWidth()/2, 0); 
+            // letters.translate((canvasWidth - letters.getWidth()) * 0.5, (canvasHeight - letters.getHeight()) * 0.5);
             this.particles.setText(letters);
         }
     );
@@ -108,61 +77,6 @@ Controller.prototype.adjust = function(factor) {
     updateCount();
 };
 
-/**
- * Captures the simulation's particle count and obstacle configuration.
- * @returns {Object} the simulation save state object
- */
-Controller.prototype.save = function() {
-    var save = {
-        size: this.particles.size,
-        particles: this.particles.getCount(),
-    };
-    return save;
-};
-
-/**
- * Restore the simulation's state from a save object.
- * @param {Object} save
- * @returns {Controller} this
- */
-Controller.prototype.restore = function(save) {
-    if (this.particles.getCount() !== save.particles) {
-        this.particles.setCount(save.particles);
-    }
-    this.clear();
-    var ps = this.particles;
-    this.controls.psize.val(ps.size = save.size);
-    return this;
-};
-
-/**
- * @param {Object} event
- * @returns {Array} the simulation coodinates from the event
- */
-Controller.coords = function(event) {
-    var $target = $(event.target),
-        offset = $target.offset(),
-        border = 1,
-        x = event.pageX - offset.left - border,
-        y = $target.height() - (event.pageY - offset.top - border);
-    return [x, y];
-};
-
-/**
- * @param {Array|ArrayBufferView|value} value
- * @param {number} [precision=4]
- * @returns {Array|number} a copy of the array/value rounded to PRECISION
- */
-Controller.round = function(value, precision) {
-    precision = precision || 4;
-    if ('length' in value) {
-        return Array.prototype.map.call(value, function (x) {
-            return Number(x.toPrecision(precision));
-        });
-    } else {
-        return Number(value.toPrecision(precision));
-    }
-};
 
 /**
  * @param {string} color

@@ -1,175 +1,65 @@
-/*global Igloo */
-
-/**
- * @param {HTMLCanvasElement} canvas
- * @param {number} nparticles initial particle count
- * @param {size} [size=5] particle size in pixels
- * @constructor
- */
-function Particles(canvas, nparticles, shapes, size) {
-    var igloo = this.igloo = new Igloo(canvas),
-        gl = igloo.gl,
-        w = canvas.width, h = canvas.height;
-    gl.disable(gl.DEPTH_TEST);
-    this.canvas = canvas;
-    this.worldsize = new Float32Array([w, h]);
-    var scale = Math.floor(Math.pow(Particles.BASE, 2) / Math.max(w, h) / 3);
-    this.scale = [scale, scale * 100];
-    this.listeners = [];
-
-    /* Vertex shader texture access not guaranteed on OpenGL ES 2.0. */
-    if (gl.getParameter(gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS) === 0) {
-        var msg = 'Vertex shader texture access not available.' +
-                'Try again on another platform.';
-        alert(msg);
-        throw new Error(msg);
-    }
-
-    /* Drawing parameters. */
-    this.size = size || 5;
-    this.color = [0.14, 0.62, 1, 0.6];
-
-    /* Simulation parameters. */
-    this.running = false;
-
-    function texture() {
-        return igloo.texture(null, gl.RGBA, gl.CLAMP_TO_EDGE, gl.NEAREST);
-    }
-
-    this.programs = {
-        update:  igloo.program('glsl/quad.vert', 'glsl/update.frag'),
-        draw:    igloo.program('glsl/draw.vert', 'glsl/draw.frag'),
-        flat:    igloo.program('glsl/quad.vert', 'glsl/flat.frag'),
-        ocircle: igloo.program('glsl/ocircle.vert', 'glsl/ocircle.frag')
-    };
-    this.buffers = {
-        quad: igloo.array(Igloo.QUAD2),
-        indexes: igloo.array(),
-        point: igloo.array(new Float32Array([0, 0]))
-    };
-    this.textures = {
-        p0: texture(),
-        p1: texture(),
-        v0: texture(),
-        v1: texture(),
-    };
-    this.framebuffers = {
-        step: igloo.framebuffer(),
-    };
-
-    this.ps = [];
-
-    var tw = Math.ceil(Math.sqrt(nparticles)),
-    th = Math.floor(Math.sqrt(nparticles));
-    this.statesize = new Float32Array([tw, th]);
-    this.letters = shapes;
-    this.initTextures(shapes);
-    this.initBuffers();
-
+function Particles(renderer, scene, camera, numParticles) {
+    this.renderer = renderer;
+    this.scene = scene;
+    this.numParticles = numParticles;
+    this.camera = camera;  
 }
 
-/**
- * Encoding base.
- * @type {number}
- * @const
- */
-Particles.BASE = 255;
+Particles.prototype.getWidth = function() {
+    return this.renderer.getSize().width;
+}
 
-/**
- * @param {number} value
- * @param {number} scale to maximize use of dynamic range
- * @returns {Array} the 2-byte encoding of VALUE
- */
-Particles.encode = function(value, scale) {
-    var b = Particles.BASE;
-    value = value * scale + b * b / 2;
-    var pair = [
-        Math.floor((value % b) / b * 255),
-        Math.floor(Math.floor(value / b) / b * 255)
-    ];
-    return pair;
-};
+Particles.prototype.getHeight = function() {
+    return this.renderer.getSize().height;
+}
 
-/**
- * @param {Array} pair
- * @param {number} scale to maximize use of dynamic range
- * @returns {number} the value for the encoded PAIR
- */
-Particles.decode = function(pair, scale) {
-    var b = Particles.BASE;
-    return (((pair[0] / 255) * b +
-             (pair[1] / 255) * b * b) - b * b / 2) / scale;
-};
+Particles.prototype.createParticles = function(letters, numParticles) {
+    var geom = new THREE.Geometry(),
+        mat = new THREE.ParticleBasicMaterial({
+            color: 0xFFFFFF,
+            size: 1
+        });
+    var particles = new THREE.Points(geom, mat);
+    this.particles = particles;
+    this.scene.add(particles);
+    var points = letters.samplePoints(numParticles);
+    for (var i = 0; i < numParticles; i++) {
+        var point = new THREE.Vector3(points[i].x, points[i].y, 0)
+        point.velocity = new THREE.Vector3(Math.random()-0.5, Math.random()-0.5)
+        geom.vertices.push(point);
+    }
+}
 
-Particles.prototype.insertParticle = function(p, v) {
-  this.ps.push({
-          x: p[0],
-          y: p[1],
-          speed: v[0],
-          radius: 5+Math.random()*5, //between 5 and 10
-          base_radius: Math.random() * 20,
-          color: "white",
-  })
-};
-
-/**
- * Allocates textures and fills them with initial random state.
- * @returns {Particles} this
- */
-Particles.prototype.initTextures = function(letters) {
-    if (!letters) {
+Particles.prototype.moveParticles = function(letters) {
+    if (!this.particles) {
+        this.createParticles(letters, this.numParticles);
         return this;
     }
-    var tw = this.statesize[0], th = this.statesize[1],
-        w = this.worldsize[0], h = this.worldsize[1],
-        s = this.scale,
-        rgbaP = new Uint8Array(tw * th * 4),
-        rgbaV = new Uint8Array(tw * th * 4);
-    var randomPoints = letters.samplePoints(th*tw);
-    for (var y = 0; y < th; y++) {
-        for (var x = 0; x < tw; x++) {
-            var randomPoint = randomPoints[y * tw + x];
-            var i = y * tw * 4 + x * 4,
-                px = Particles.encode(randomPoint.x , s[0]),
-                py = Particles.encode(randomPoint.y, s[0]),
-                vx = Particles.encode(0, s[1]),
-                vy = Particles.encode(0, s[1]);
-            rgbaP[i + 0] = px[0];
-            rgbaP[i + 1] = px[1];
-            rgbaP[i + 2] = py[0];
-            rgbaP[i + 3] = py[1];
-            rgbaV[i + 0] = vx[0];
-            rgbaV[i + 1] = vx[1];
-            rgbaV[i + 2] = vy[0];
-            rgbaV[i + 3] = vy[1];
-        }
+    var points = letters.samplePoints(this.numParticles);
+    for (var i = 0; i < this.numParticles; i++) {
+        this.particles.geometry.vertices[i].x = points[i].x;
+        this.particles.geometry.vertices[i].y = points[i].y;
     }
-
-    this.textures.p0.set(rgbaP, tw, th);
-    this.textures.v0.set(rgbaV, tw, th);
-    this.textures.p1.blank(tw, th);
-    this.textures.v1.blank(tw, th);
+    this.particles.geometry.verticesNeedUpdate = true;
     return this;
-};
+}
 
-/**
- * Allocate array buffers and fill with needed values.
- * @returns {Particles} this
- */
-Particles.prototype.initBuffers = function() {
-    var tw = this.statesize[0], th = this.statesize[1],
-        gl = this.igloo.gl,
-        indexes = new Float32Array(tw * th * 2);
-    for (var y = 0; y < th; y++) {
-        for (var x = 0; x < tw; x++) {
-            var i = y * tw * 2 + x * 2;
-            indexes[i + 0] = x;
-            indexes[i + 1] = y;
+Particles.prototype.drawParticles = function() {
+    if (this.particles) {
+        for (var i = 0; i < this.numParticles; i++) {
+            var particle = this.particles.geometry.vertices[i];
+            particle.add(particle.velocity);
+            particle.velocity.x = Math.random()-0.5
+            particle.velocity.y = Math.random()-0.5;
         }
+        this.particles.geometry.verticesNeedUpdate = true;
     }
-    this.buffers.indexes.update(indexes, gl.STATIC_DRAW);
-    return this;
-};
+    this.renderer.render(scene, camera);
+}
+
+Particles.prototype.getCount = function() {
+    return this.numParticles;
+}
 
 /**
  * Set a new particle count. This is a minimum and the actual count
@@ -181,228 +71,15 @@ Particles.prototype.setCount = function(n) {
     var tw = Math.ceil(Math.sqrt(n)),
         th = Math.floor(Math.sqrt(n));
     this.statesize = new Float32Array([tw, th]);
-    this.initTextures(this.letters);
-    this.initBuffers();
     return this;
 };
 
 Particles.prototype.setText = function(newLetters) {
     this.letters = newLetters;
-    this.initTextures(newLetters);
-    console.log('NEW LETTERS');
-    console.log(newLetters);
-
     // TODO replace draw function (see order in main.js)
-    this.initBuffers();
-    this.draw();
+    this.moveParticles(newLetters);
+    this.drawParticles();
     return this;
 }
-/**
- * @returns {number} the actual particle count
- */
-Particles.prototype.getCount = function() {
-    return this.statesize[0] * this.statesize[1];
-};
-
-/**
- * @returns {Array} list of all particle positions
- */
-Particles.prototype.get = function() {
-    var gl = this.igloo.gl;
-    this.framebuffers.step.attach(this.textures.p0);
-    var w = this.statesize[0], h = this.statesize[1],
-        s = this.scale,
-        rgba = new Uint8Array(w * h * 4);
-    gl.readPixels(0, 0, w, h, gl.RGBA, gl.UNSIGNED_BYTE, rgba);
-    var particles = [];
-    for (var y = 0; y < h; y++) {
-        for (var x = 0; x < w; x++) {
-            var i = y * w * 4 + x * 4,
-                px = Particles.decode([rgba[i + 0], rgba[i + 1]], s[0]),
-                py = Particles.decode([rgba[i + 2], rgba[i + 3]], s[0]);
-            particles.push({x: px, y: py});
-        }
-    }
-    return particles;
-};
-
-/**
- * Swap the foreground and background state.
- * @returns {Particles} this
- */
-Particles.prototype.swap = function() {
-    var tmp = this.textures.p0;
-    this.textures.p0 = this.textures.p1;
-    this.textures.p1 = tmp;
-    tmp = this.textures.v0;
-    this.textures.v0 = this.textures.v1;
-    this.textures.v1 = tmp;
-    return this;
-};
 
 
-
-/**
- * Step the simulation forward by one iteration.
- * @returns {Particles} this
- */
-Particles.prototype.step = function() {
-    var igloo = this.igloo, gl = igloo.gl;
-    gl.disable(gl.BLEND);
-    this.framebuffers.step.attach(this.textures.p1);
-    this.textures.p0.bind(0);
-    this.textures.v0.bind(1);
-    gl.viewport(0, 0, this.statesize[0], this.statesize[1]);
-    this.programs.update.use()
-        .attrib('quad', this.buffers.quad, 2)
-        .uniformi('position', 0)
-        .uniformi('velocity', 1)
-        .uniform('scale', this.scale)
-        .uniform('random', Math.random() * 2.0 - 1.0)
-        .uniform('worldsize', this.worldsize)
-        .uniformi('derivative', 0)
-        .draw(gl.TRIANGLE_STRIP, Igloo.QUAD2.length / 2);
-    this.framebuffers.step.attach(this.textures.v1);
-    this.programs.update
-        .uniformi('derivative', 1)
-        .uniform('random', Math.random() * 2.0 - 1.0)
-        .draw(gl.TRIANGLE_STRIP, Igloo.QUAD2.length / 2);
-    this.swap();
-    return this;
-};
-
-/**
- * Draw the current simulation state to the display.
- * @returns {Particles} this
- */
-Particles.prototype.draw = function() {
-    var igloo = this.igloo, gl = igloo.gl;
-    gl.enable(gl.BLEND);
-    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-    igloo.defaultFramebuffer.bind();
-    gl.viewport(0, 0, this.worldsize[0], this.worldsize[1]);
-    gl.clearColor(0, 0, 0, 1);
-    gl.clear(gl.COLOR_BUFFER_BIT);
-    this.textures.p0.bind(0);
-    this.textures.v0.bind(1);
-    this.programs.draw.use()
-        .attrib('index', this.buffers.indexes, 2)
-        .uniformi('positions', 0)
-        .uniformi('velocities', 1)
-        .uniform('statesize', this.statesize)
-        .uniform('worldsize', this.worldsize)
-        .uniform('size', this.size)
-        .uniform('scale', this.scale)
-        .uniform('color', this.color)
-        .draw(gl.POINTS, this.statesize[0] * this.statesize[1]);
-    this.programs.flat.use()
-        .attrib('quad', this.buffers.quad, 2)
-        .uniformi('background', 2)
-        .uniform('worldsize', this.worldsize)
-        .draw(gl.TRIANGLE_STRIP, Igloo.QUAD2.length / 2);
-    return this;
-};
-
-/**
- * Register with requestAnimationFrame to step and draw a frame.
- * @returns {Particles} this
- */
-Particles.prototype.frame = function() {
-    window.requestAnimationFrame(function() {
-        if (this.running) {
-          // TODO: fully remove below step()....
-            // this.step().draw().frame();
-            for (var i = 0; i < this.listeners.length; i++) {
-                this.listeners[i]();
-            }
-        }
-    }.bind(this));
-    return this;
-};
-
-// TODO:  Include main loop in rendering  particles
-// TODO: merge with above frame function()
-
-// // Main loop for rendering particles
-// function loop() {
-// 	window.requestAnimFrame(loop);
-// 	createParticles();
-// 	updateParticles();
-// 	killParticles();
-// 	drawParticles();
-// }
-// window.requestAnimFrame(loop);
-
-
-// TODO: possibly merge this with Particles.prototype.frame
-window.requestAnimFrame = (function(){
-  return  window.requestAnimationFrame       ||
-          window.webkitRequestAnimationFrame ||
-          window.mozRequestAnimationFrame    ||
-          window.oRequestAnimationFrame      ||
-          window.msRequestAnimationFrame     ||
-          function( callback ){
-            window.setTimeout(callback, 1000 / 60);
-          };
-})();
-
-
-/**
- * Start animating the simulation if it isn't already.
- * @returns {Particles} this
- */
-Particles.prototype.start = function() {
-    if (!this.running) {
-        this.running = true;
-        this.frame();
-    }
-    return this;
-};
-
-/**
- * Immediately stop the animation.
- * @returns {Particles} this
- */
-Particles.prototype.stop = function() {
-    this.running = false;
-    return this;
-};
-
-
-Particles.prototype.applyDynamics = function() {
-  // particles.letters.vertices = array of point positions
-  // TODO insert optimal transport algorithm here
-  particles = this.particles.letters.vertices;
-  for (var i in particles)  {
-    var particle = particles[i];
-    particle.x += Math.random();
-    particle.y += Math.random();
-  }
-  // TODO: remove this I think
-  this.particles.letters.vertices = particles;
-}
-
-Particles.prototype.killParticles = function() {
-  particles = this.particles.letters.vertices;
-	for (var i in particles) {
-		var particle = particles[i];
-		if (particle.y > canvas.height) {
-			particle.y = 0
-		}
-	}
-}
-
-Particles.prototype.drawParticles = function() {
-
-  this.canvas.fillStyle = "black";
-  this.canvas.fillRect(0,0,this.canvas.width,this.canvas.height);
-  particles = this.particles.letters.vertices;
-  for(var i in particles) {
-      var part = particles[i];
-      this.canvas.beginPath();
-      this.canvas.arc(part.x,part.y, part.radius, 0, Math.PI*2);
-      this.canvas.closePath();
-      this.canvas.fillStyle = part.color;
-      this.canvas.fill();
-  }
-}

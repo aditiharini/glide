@@ -24,24 +24,15 @@ Letters.prototype.samplePoints = function(numPoints) {
 }
 
 Letters.prototype.scale = function (factor) {
-    this.shape.applyMatrix(new THREE.Matrix4().makeScale(
-        factor,
-        factor,
-        1
-    ));
+    this.shape.scale(factor, factor, 0); 
 }
 
 Letters.prototype.scaleToFit = function (width, height) {
-    var lettersWidth = this.getWidth()
-    if (lettersWidth > width) {
-        var scaleFactor = width / lettersWidth;
-        this.scale(scaleFactor);
+    if (this.getWidth() > width) {
+        this.scale(width/this.getWidth());
     }
 }
 
 Letters.prototype.translate = function (deltaX, deltaY) {
-    this.shape.applyMatrix( new THREE.Matrix4().makeTranslation(
-        deltaX,
-        deltaY,
-        0));
+    this.shape.translate(deltaX, deltaY, 0);
 }
