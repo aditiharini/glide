@@ -69,5 +69,4 @@ for i in range(xs.shape[0]):
 
 plt.figure(2)
 plt.imshow(G, interpolation='nearest') # mapping gamma weights
-
 plt.show()

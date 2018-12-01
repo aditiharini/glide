@@ -1,3 +1,6 @@
+// TODO: remove: no longer needed because would need to create constraint for each
+// mmatrix element
+// verified with Z3 example
 var generateCost = function(d1,d2) {
   // Create mapping of dist costs
 
