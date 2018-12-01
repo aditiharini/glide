@@ -6,12 +6,14 @@ TODO:
 
 In progress
 - animating particles to move from one location to another
+- debugging performance issues with threejs particles
+- implementing working optimal transport algorithm
 
 
 Current status:
-- can display multiple letters as a set of discrete points randomized around anchors
 - dynamically enter text
 - display letters in proper, curved shapes
+- using threejs for rendering
 
 
 Workflow:
