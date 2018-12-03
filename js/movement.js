@@ -1,12 +1,12 @@
 var generateExpCosts = function(d1,d2) {
-  var scalar = 0.05;
+  var scalar = 0.00005;
   var costExpMatrix = [];
   for (var i=0; i<d1.length;i++) {
     costExpMatrix[i] = [];
     for (var j=0; j<d2.length; j++) {
       dist = Math.pow((d1[i].x- d2[i].x), 2) + Math.pow(d1[i].y- d2[i].y, 2);
-      //costExpMatrix[i][j] = Math.pow(Math.E, (-dist * scalar));
-      costExpMatrix[i][j] = (-1 * -dist * scalar);
+      val = Math.pow(Math.E, (-1* dist * scalar)))
+      costExpMatrix[i][j] = val;
     }
   }
   return costExpMatrix;
@@ -37,13 +37,10 @@ function multiply(m, scalarCol, method){
 }
 
 var sinkhorn = function(m, scaleRow=true, err=1.0, i=0, timeout=100, stopThres=1e-9) {
-  console.log("SINKHORN");
-  console.log(m);
   while(Math.abs(err) > stopThres && i < timeout) {
     i += 1;
     if (scaleRow) { // scaling each Row
       var sums = m.reduce(sumRow);
-
       var err = sums.reduce(getSum) - m[0].length; // substract by num cols
       multiply(m, sums, 'row');
       scaleRow= !scaleRow;
@@ -59,10 +56,7 @@ var sinkhorn = function(m, scaleRow=true, err=1.0, i=0, timeout=100, stopThres=1
 
 var getWeights = function(d1,d2) {
   var costs = generateExpCosts(d1,d2);
-  console.log(costs);
   var m = sinkhorn(costs);
-  console.log('sdfsdf');
-  console.log(m);
   return m;
 }
 
