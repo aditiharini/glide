@@ -3,7 +3,7 @@ function Particles(renderer, scene, camera, numParticles) {
     this.scene = scene;
     this.numParticles = numParticles;
     this.camera = camera;  
-    this.isMoving = false;
+    this.isTransporting = false;
 }
 
 Particles.prototype.getWidth = function() {
@@ -12,6 +12,10 @@ Particles.prototype.getWidth = function() {
 
 Particles.prototype.getHeight = function() {
     return this.renderer.getSize().height;
+}
+
+Particles.prototype.getPoints = function() {
+    return this.particles.geometry.vertices;
 }
 
 Particles.prototype.createParticles = function(letters, numParticles) {
@@ -45,13 +49,29 @@ Particles.prototype.moveParticles = function(letters) {
     return this;
 }
 
+Particles.prototype.setMapping = function(weights, endPoints) {
+    console.log(weights);
+    var weights = maxByRow(weights);
+    for (var i = 0; i < this.numParticles; i++) {
+        var startPoint = this.particles.geometry.vertices[i];
+        var endPoint = endPoints[weights[i]];
+        var distance = Math.sqrt(Math.pow(endPoint.y-startPoint.y, 2) + Math.pow(endPoint.x-startPoint.x, 2));
+        startPoint.dest = endPoint;
+        startPoint.velocity.x = (endPoint.x - startPoint.x) / distance;
+        startPoint.velocity.y = (endPoint.y - startPoint.y) / distance;
+    }
+}
+
 Particles.prototype.drawParticles = function() {
     if (this.particles) {
         for (var i = 0; i < this.numParticles; i++) {
             var particle = this.particles.geometry.vertices[i];
-            particle.add(particle.velocity);
-            particle.velocity.x = Math.random()-0.5
-            particle.velocity.y = Math.random()-0.5;
+            if (this.isTransporting) {
+                if (particle.x == particle.dest.x && particle.y == particle.dest.y){
+                    particle.velocity.x = 0;
+                    particle.velocity.y = 0;
+                }
+            }
         }
         this.particles.geometry.verticesNeedUpdate = true;
     }

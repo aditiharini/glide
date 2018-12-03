@@ -45,10 +45,13 @@ function Controller(startParticles, endParticles) {
             }
         }),
         moveText: $('.controls .move').on('click', function() {
-            _this.startParticles.isMoving = true;
+            _this.startParticles.isTransporting = true;
+            var startPoints = _this.startParticles.getPoints();
+            var endPoints = _this.endParticles.getPoints();
+            console.log(startPoints);
+            console.log(endPoints);
+            _this.startParticles.setMapping(getWeights(startPoints, endPoints), endPoints);
         })
-        
-
     };
 }
 
@@ -68,7 +71,6 @@ Controller.prototype.changeText = function(particles, newText) {
             else {
                 letters.translate(-letters.getWidth()/2, -letters.getHeight()); 
             } 
-            // letters.translate((canvasWidth - letters.getWidth()) * 0.5, (canvasHeight - letters.getHeight()) * 0.5);
             particles.setText(letters);
         }
     );
