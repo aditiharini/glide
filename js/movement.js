@@ -52,7 +52,6 @@ var sinkhorn = function(m, scaleRow=true, err=1.0, i=0, timeout=100, stopThres=1
       multiply(m, sums, 'col');
     }
     scaleRow= !scaleRow;
-    // console.log(sums);
   }
   return m;
 }
@@ -61,6 +60,7 @@ var getWeights = function(d1,d2) {
   var costs = generateExpCosts(d1,d2);
   console.log(costs);
   var m = sinkhorn(costs);
+  console.log('sdfsdf');
   console.log(m);
   return m;
 }
