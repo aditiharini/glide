@@ -25,11 +25,7 @@ num_it = 2
 start = generate_points(m)
 dest = generate_points(n)
 costs = generate_costs(start, dest)
-print("START", start)
-print("DEST", dest)
-print("COSTS", costs)
 t = np.exp(-costs*alpha)
-print(t)
 for i in range(num_it):
     t = rescale_rows(t)
     print(t)
