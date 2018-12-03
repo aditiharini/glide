@@ -13,44 +13,42 @@ var generateExpCosts = function(d1,d2) {
   return costExpMatrix;
 }
 
-// TODO make sumRow and getSum the same function
-// TODO correct mapping of sum by Row and by Columm
 var sumRow = (r, a) => r.map((b, i) => a[i] + b);
-var sumCol = (r, a) => r.map((b, i) => a[i] + b);
-
+var sumCol = function(a) {
+	return c.map(function(y){
+    	return y.reduce(function(a,b){
+        	return a+b;
+	    })
+	})
+}
 function getSum(total,num) {
   return total + num;
 }
 
-var sinkhorn = function(m, scaleRow=true, err=1.0, i=0, timeout=100, stopThres=1e-9) {
+function multiply(m, scalarCol, method){
+  for (var i=0; i<m.length;i++) { // # rows
+    for (var j=0; j<m[i].length; j++) { // # cols
+      if (method == 'row') {
+        m[i][j] *= 1./scalar[i];
+      } else {
+        m[i][j] *= 1./scalar[j];
+      }
+    }
+  }
+}
 
-	// while (abs(err) > stopThres and i < timeout):
+var sinkhorn = function(m, scaleRow=true, err=1.0, i=0, timeout=100, stopThres=1e-9) {
   while( abs(err) > stopThres && i < timeout) {
     i += 1;
     if (scaleRow) { // scaling each Row
       var sums = m.reduce(sumRow);
       var err = sums.reduce(getSum) - m[0].size; // substract by num cols
-      var scalar = 1.0/sums;
-      // TODO: need to check whether this actually matrix multiplies
-      m = math.dotMultiply(m, scalar);
-    	// 		sums = np.sum(t, axis=1)
-    	// 		err = np.sum(sums) - m
-    	// 		scalar = 1.0/sums
-    	// 		t = (t.transpose() * scalar).transpose()
-    	// 		print(t)
-    	// 		print("new sum {} by rows".format(np.sum(t, axis=1)))
+      m = multiply(m, sums, 'row');
       scaleRow= !scaleRow;
     } else { // scaling each column
-      var sums = m.reduce(sumCol);
+      var sums = sumCol(m);
       var err = sums.reduce(getSum) - m.size; // substract by num cols
-      var scalar = 1.0/sums;
-      m = math.dotMultiply(m, scalar);
-      // 		sums = np.sum(t, axis=0)
-      // 		err = np.sum(sums) - n
-      // 		scalar = 1.0/sums
-      // 		t =  t * scalar.transpose()
-      // 		print(t)
-      // 		print("new sum {} by cols".format(np.sum(t, axis=0)))
+      m = multiply(m, sums, 'col');
     }
   }
   return m;
