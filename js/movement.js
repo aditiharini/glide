@@ -53,3 +53,9 @@ var sinkhorn = function(m, scaleRow=true, err=1.0, i=0, timeout=100, stopThres=1
   }
   return m;
 }
+
+var getWeights = function(d1,d2) {
+  var costs = generateExpCosts(d1,d2);
+  var m = sinkhorn(costs);
+  return m;
+}
