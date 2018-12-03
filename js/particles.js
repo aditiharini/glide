@@ -3,6 +3,7 @@ function Particles(renderer, scene, camera, numParticles) {
     this.scene = scene;
     this.numParticles = numParticles;
     this.camera = camera;  
+    this.isMoving = false;
 }
 
 Particles.prototype.getWidth = function() {

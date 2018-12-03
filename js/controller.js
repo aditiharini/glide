@@ -43,6 +43,9 @@ function Controller(startParticles, endParticles) {
             if (newText != "") {
                 _this.changeText(_this.endParticles, newText)
             }
+        }),
+        moveText: $('.controls .move').on('click', function() {
+            _this.startParticles.isMoving = true;
         })
         
 
