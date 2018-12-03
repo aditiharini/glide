@@ -50,8 +50,8 @@ Particles.prototype.moveParticles = function(letters) {
 }
 
 Particles.prototype.setMapping = function(weights, endPoints) {
-    console.log(weights);
     var weights = maxByRow(weights);
+    console.log(weights);
     for (var i = 0; i < this.numParticles; i++) {
         var startPoint = this.particles.geometry.vertices[i];
         var endPoint = endPoints[weights[i]];
@@ -67,10 +67,10 @@ Particles.prototype.drawParticles = function() {
         for (var i = 0; i < this.numParticles; i++) {
             var particle = this.particles.geometry.vertices[i];
             if (this.isTransporting) {
-                if (particle.x == particle.dest.x && particle.y == particle.dest.y){
-                    particle.velocity.x = 0;
-                    particle.velocity.y = 0;
-                }
+                var distance = Math.sqrt(Math.pow(particle.dest.y-particle.y, 2) + Math.pow(particle.dest.x-particle.x, 2));
+                particle.velocity.x = (particle.dest.x - particle.x) / distance;
+                particle.velocity.y = (particle.dest.y - particle.y) / distance;
+                particle.add(particle.velocity)
             }
         }
         this.particles.geometry.verticesNeedUpdate = true;
