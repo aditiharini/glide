@@ -5,7 +5,7 @@ var generateExpCosts = function(d1,d2) {
     costExpMatrix[i] = [];
     for (var j=0; j<d2.length; j++) {
       dist = Math.pow((d1[i].x- d2[i].x), 2) + Math.pow(d1[i].y- d2[i].y, 2);
-      val = Math.pow(Math.E, (-1* dist * scalar)))
+      val = Math.pow(Math.E, (-1* dist * scalar));
       costExpMatrix[i][j] = val;
     }
   }
