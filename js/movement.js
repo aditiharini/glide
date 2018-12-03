@@ -13,7 +13,7 @@ var generateExpCosts = function(d1,d2) {
 }
 
 var sumRow = (r, a) => r.map((b, i) => a[i] + b);
-var sumCol = function(a) {
+var sumCol = function(c) {
 	return c.map(function(y){
     	return y.reduce(function(a,b){
         	return a+b;
@@ -36,19 +36,21 @@ function multiply(m, scalarCol, method){
   }
 }
 
-var sinkhorn = function(m, scaleRow=true, err=1.0, i=0, timeout=100, stopThres=1e-9) {
+var sinkhorn = function(m, scaleRow=true, err=1.0, i=0, timeout=100, stopThres=1e-9)
   while(Math.abs(err) > stopThres && i < timeout) {
     i += 1;
     if (scaleRow) { // scaling each Row
       var sums = m.reduce(sumRow);
-      var err = sums.reduce(getSum) - m[0].size; // substract by num cols
+
+      var err = sums.reduce(getSum) - m[0].length; // substract by num cols
       m = multiply(m, sums, 'row');
       scaleRow= !scaleRow;
     } else { // scaling each column
       var sums = sumCol(m);
-      var err = sums.reduce(getSum) - m.size; // substract by num cols
+      var err = sums.reduce(getSum) - m.length; // substract by num cols
       m = multiply(m, sums, 'col');
     }
+    // console.log(sums);
   }
   return m;
 }
