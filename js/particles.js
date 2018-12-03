@@ -51,7 +51,6 @@ Particles.prototype.moveParticles = function(letters) {
 
 Particles.prototype.setMapping = function(weights, endPoints) {
     var weights = maxByRow(weights);
-    console.log(weights);
     for (var i = 0; i < this.numParticles; i++) {
         var startPoint = this.particles.geometry.vertices[i];
         var endPoint = endPoints[weights[i]];

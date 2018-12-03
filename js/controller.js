@@ -8,7 +8,6 @@ function Controller(startParticles, endParticles) {
     this.startParticles = startParticles;
     this.endParticles = endParticles;
     this.mousedown = false;
-    console.log(this.startParticles)
 
     var _this = this;
 
@@ -48,8 +47,6 @@ function Controller(startParticles, endParticles) {
             _this.startParticles.isTransporting = true;
             var startPoints = _this.startParticles.getPoints();
             var endPoints = _this.endParticles.getPoints();
-            console.log(startPoints);
-            console.log(endPoints);
             _this.startParticles.setMapping(getWeights(startPoints, endPoints), endPoints);
         })
     };
@@ -60,7 +57,6 @@ Controller.prototype.changeText = function(particles, newText) {
     loader.load(
         '../fonts/helvetiker_bold.typeface.json',
         function ( font ) {
-            console.log(particles);
             var letters = new Letters(newText, font); 
             var canvasWidth = particles.getWidth();
             var canvasHeight = particles.getHeight();
