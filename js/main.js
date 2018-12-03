@@ -13,7 +13,8 @@ window.requestAnimFrame = (function(){
 })();
 
 
-var particles = null,
+var startParticles = null,
+    endParticles = null,
     controller = null,
     scene = null,
     renderer = null,
@@ -25,7 +26,8 @@ function updateCount() {
 }
 
 function render() {
-    particles.drawParticles();
+    startParticles.drawParticles();
+    endParticles.drawParticles();
     requestAnimFrame(render);
 }
 // set the scene size
@@ -40,7 +42,9 @@ $(document).ready(function() {
     renderer.setClearColor(new THREE.Color(0, 0, 0));
 	renderer.setSize(WIDTH, HEIGHT);
     document.body.appendChild(renderer.domElement);
-    particles = new Particles(renderer, scene, camera, 1000*10);
-    controller = new Controller(particles);
+    startParticles = new Particles(renderer, scene, camera, 1000);
+    endParticles = new Particles(renderer, scene, camera, 1000);
+    console.log(startParticles);
+    controller = new Controller(startParticles, endParticles);
     render()
 });
