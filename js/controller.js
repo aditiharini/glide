@@ -4,10 +4,11 @@
  * User interface connection to the simulation.
  * @constructor
  */
-function Controller(particles) {
-    this.particles = particles;
-    this.init();
+function Controller(startParticles, endParticles) {
+    this.startParticles = startParticles;
+    this.endParticles = endParticles;
     this.mousedown = false;
+    console.log(this.startParticles)
 
     var _this = this;
 
@@ -31,37 +32,41 @@ function Controller(particles) {
         clear: $('.controls .clear').on('click', function() {
             _this.clear();
         }),
-        text: $('.controls .text').on('keyup', function() {
+        startText: $('.controls .start').on('keyup', function() {
             var newText = $(this).val();
             if (newText != ""){
-                _this.changeText(newText);
+                _this.changeText(_this.startParticles, newText);
+            }
+        }),
+        endText: $('.controls .end').on('keyup', function() {
+            var newText = $(this).val();
+            if (newText != "") {
+                _this.changeText(_this.endParticles, newText)
             }
         })
+        
+
     };
 }
 
-/**
- * Create and capture the mouse obstacle.
- * @returns {Controller} this
- */
-Controller.prototype.init = function() {
-    // TODO(aditi): set initial state
-    return this;
-};
-
-Controller.prototype.changeText = function(newText) {
+Controller.prototype.changeText = function(particles, newText) {
     var loader = new THREE.FontLoader();
     loader.load(
         '../fonts/helvetiker_bold.typeface.json',
         function ( font ) {
-            console.log(newText);
+            console.log(particles);
             var letters = new Letters(newText, font); 
-            var canvasWidth = this.particles.getWidth();
-            var canvasHeight = this.particles.getHeight();
+            var canvasWidth = particles.getWidth();
+            var canvasHeight = particles.getHeight();
             letters.scaleToFit(canvasWidth, canvasHeight);
-            letters.translate(-letters.getWidth()/2, 0); 
+            if (particles == this.startParticles) {
+                letters.translate(-letters.getWidth()/2, letters.getHeight()); 
+            }
+            else {
+                letters.translate(-letters.getWidth()/2, -letters.getHeight()); 
+            } 
             // letters.translate((canvasWidth - letters.getWidth()) * 0.5, (canvasHeight - letters.getHeight()) * 0.5);
-            this.particles.setText(letters);
+            particles.setText(letters);
         }
     );
 }
