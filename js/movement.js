@@ -13,6 +13,7 @@ var generateExpCosts = function(d1,d2) {
 }
 
 var sumRow = (r, a) => r.map((b, i) => a[i] + b);
+
 var sumCol = function(c) {
 	return c.map(function(y){
     	return y.reduce(function(a,b){
@@ -20,6 +21,7 @@ var sumCol = function(c) {
 	    })
 	})
 }
+
 function getSum(total,num) {
   return total + num;
 }
@@ -43,13 +45,12 @@ var sinkhorn = function(m, scaleRow=true, err=1.0, i=0, timeout=100, stopThres=1
       var sums = m.reduce(sumRow);
       var err = sums.reduce(getSum) - m[0].length; // substract by num cols
       multiply(m, sums, 'row');
-      scaleRow= !scaleRow;
     } else { // scaling each column
       var sums = sumCol(m);
       var err = sums.reduce(getSum) - m.length; // substract by num cols
       multiply(m, sums, 'col');
-      scaleRow= !scaleRow;
     }
+    scaleRow= !scaleRow;
   }
   return m;
 }
@@ -69,5 +70,5 @@ function maxByRow(m) {
   m.forEach(row => {
     argMaxes.push(argMax(row));
   });
-  return maxes;
+  return argMaxes;
 }
