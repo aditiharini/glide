@@ -44,7 +44,11 @@ Controller.prototype.changeText = function(particles, newText) {
             var canvasHeight = particles.getHeight();
             letters.scaleToFit(canvasWidth, canvasHeight);
             if (particles == this.startParticles) {
+<<<<<<< HEAD
                 letters.translate(-letters.getWidth()/2, letters.getHeight());
+=======
+                letters.translate(-letters.getWidth()/2, 50); 
+>>>>>>> 2c067bea09c5902478a0ca0f3b575f8891fada55
             }
             else {
                 letters.translate(-letters.getWidth()/2, -letters.getHeight());
