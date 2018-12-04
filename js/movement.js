@@ -2,11 +2,12 @@ var generateExpCosts = function(d1,d2) {
   var scalar = 0.00005;
   var costExpMatrix = [];
   for (var i=0; i<d1.length;i++) {
-    costExpMatrix[i] = [];
+    costExpMatrix[i] = []
     for (var j=0; j<d2.length; j++) {
-      dist = Math.pow((d1[i].x- d2[i].x), 2) + Math.pow(d1[i].y- d2[i].y, 2);
-      val = Math.pow(Math.E, (-1* dist * scalar));
-      costExpMatrix[i][j] = val;
+      dist = Math.pow((d1[i].x- d2[j].x), 2) + Math.pow(d1[i].y- d2[j].y, 2);
+      exp = -1* dist * scalar
+      val = Math.pow(Math.E,exp);
+      costExpMatrix[i][j] =val;
     }
   }
   return costExpMatrix;
@@ -42,12 +43,12 @@ var sinkhorn = function(m, scaleRow=true, err=1.0, i=0, timeout=100, stopThres=1
   while(Math.abs(err) > stopThres && i < timeout) {
     i += 1;
     if (scaleRow) { // scaling each Row
-      var sums = m.reduce(sumRow);
-      var err = sums.reduce(getSum) - m[0].length; // substract by num cols
-      multiply(m, sums, 'row');
-    } else { // scaling each column
       var sums = sumCol(m);
-      var err = sums.reduce(getSum) - m.length; // substract by num cols
+      multiply(m, sums, 'row');
+      err = sums.reduce(getSum) - m[0].length; // substract by num cols
+    } else { // scaling each column
+      var sums = m.reduce(sumRow);
+      err = sums.reduce(getSum) - m.length; // substract by num cols
       multiply(m, sums, 'col');
     }
     scaleRow= !scaleRow;
@@ -72,7 +73,7 @@ function argMin(array) {
 function maxByRow(m) {
   argMaxes = []
   m.forEach(row => {
-    argMaxes.push(argMin(row));
+    argMaxes.push(argMax(row));
   });
   return argMaxes;
 }

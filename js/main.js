@@ -2,11 +2,11 @@ function comma(num) {
     return num.toString().replace(/(\d)(?=(\d{3})+$)/g, '$1,');
 }
 window.requestAnimFrame = (function(){
-    return  window.requestAnimationFrame       || 
-            window.webkitRequestAnimationFrame || 
-            window.mozRequestAnimationFrame    || 
-            window.oRequestAnimationFrame      || 
-            window.msRequestAnimationFrame     || 
+    return  window.requestAnimationFrame       ||
+            window.webkitRequestAnimationFrame ||
+            window.mozRequestAnimationFrame    ||
+            window.oRequestAnimationFrame      ||
+            window.msRequestAnimationFrame     ||
             function(/* function */ callback, /* DOMElement */ element){
               window.setTimeout(callback, 1000 / 60);
             };
@@ -44,7 +44,6 @@ $(document).ready(function() {
     document.body.appendChild(renderer.domElement);
     startParticles = new Particles(renderer, scene, camera, 1000);
     endParticles = new Particles(renderer, scene, camera, 1000);
-    console.log(startParticles);
     controller = new Controller(startParticles, endParticles);
     render()
 });
