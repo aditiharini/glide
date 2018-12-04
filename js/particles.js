@@ -6,6 +6,7 @@ function Particles(renderer, scene, camera, numParticles) {
     this.isTransporting = false;
     this.transportMode = null;
     this.color = null;
+    this.size = null;
 }
 
 Particles.prototype.getWidth = function() {
@@ -132,6 +133,10 @@ Particles.prototype.getCount = function() {
 
 Particles.prototype.setColor = function(color) {
     this.color = color;
+}
+
+Particles.prototype.setSize = function(size) {
+  this.size = size;
 }
 
 Particles.prototype.setText = function(newLetters, color) {
