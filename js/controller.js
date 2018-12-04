@@ -50,7 +50,7 @@ Controller.prototype.changeText = function(particles, newText) {
     loader.load(
         '../fonts/helvetiker_bold.typeface.json',
         function ( font ) {
-            var letters = new Letters(newText, font); 
+            var letters = new Letters(newText, font);
             var canvasWidth = particles.getWidth();
             var canvasHeight = particles.getHeight();
             letters.scaleToFit(canvasWidth, canvasHeight);
