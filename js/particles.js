@@ -54,11 +54,8 @@ Particles.prototype.setMappingByMax = function(weights, endPoints) {
     for (var i = 0; i < this.numParticles; i++) {
         var startPoint = this.particles.geometry.vertices[i];
         var endPoint = endPoints[weights[i]];
-        var distance = Math.sqrt(Math.pow(endPoint.y-startPoint.y, 2) + Math.pow(endPoint.x-startPoint.x, 2));
         startPoint.dest = endPoint;
         startPoint.destWeight = 1;
-        startPoint.velocity.x = (endPoint.x - startPoint.x) / distance;
-        startPoint.velocity.y = (endPoint.y - startPoint.y) / distance;
     }
 }
 
@@ -71,46 +68,56 @@ Particles.prototype.setMappingByWeight = function(weights, endPoints) {
             newParticles.particles.geometry.vertices[j].destWeight = weights[j][i];
             newParticles.particles.geometry.vertices[j].dest = endPoint; 
         }
+        this.scene.add(newParticles.particles);
         this.transportSets.push(newParticles);
     }
+    this.transportSets[0].particles.geometry.vertices[0].name = "hi";
+    this.transportSets[1].particles.geometry.vertices[0].name = "bye";
+    console.log(this.transportSets[0].particles.geometry.vertices[0].name);
 }
 
 Particles.prototype.transport = function(particle) {
-    var distance = distance(particle.dest, particle);
-    particle.velocity.x = (particle.dest.x - particle.x) / distance;
-    particle.velocity.y = (particle.dest.y - particle.y) / distance;
-    particle.add(particle.velocity)
+    var dist = distance(particle.dest, particle);
+    particle.velocity.x = (particle.dest.x - particle.x) / dist;
+    particle.velocity.y = (particle.dest.y - particle.y) / dist;
+    particle.add(particle.velocity);
 }
 
 Particles.prototype.transportByMax = function () {
-    this.particles.geometry.vertices.forEach(particle=> {
-        this.transport(particle);
-    });
+    for (var i = 0; i < this.numParticles; i++) {
+        this.transport(this.particles.geometry.vertices[i]);
+    }
+    this.particles.geometry.verticesNeedUpdate = true;
 }
 
 Particles.prototype.transportByWeight = function () {
-    this.transportSets.forEach(particles => {
-        particles.geometry.vertices.forEach(particle => {
-            this.transport(particle); 
-        });
-    });
+    for (var i = 0; i < this.transportSets.length; i++) {
+        for (var j = 0; j < this.numParticles; j++) {
+            this.transport(this.transportSets[i].particles.geometry.vertices[j]);
+        }
+        this.transportSets[i].particles.geometry.verticesNeedUpdate = true;
+    }
 }
 
 Particles.prototype.clone = function() {
     newParticles = new Particles(this.renderer, this.scene, this.camera, this.numParticles);
-    newParticles.particles = this.particles.clone();
+    var geom = new THREE.Geometry(),
+        mat = new THREE.ParticleBasicMaterial({
+        color: 0xFFFFFF,
+        size: 1
+    });
+    newParticles.particles = new THREE.Points(geom, mat);
+    for (var i = 0; i < this.numParticles; i++) {
+        var oldParticle = this.particles.geometry.vertices[i];
+        newParticles.particles.geometry.vertices.push(new THREE.Vector3(oldParticle.x, oldParticle.y, 0));
+        newParticles.particles.geometry.vertices[i].velocity = new THREE.Vector3(0, 0, 0);
+    }
     return newParticles;
 }
 
 Particles.prototype.drawParticles = function() {
-    if (this.particles) {
-        for (var i = 0; i < this.numParticles; i++) {
-            var particle = this.particles.geometry.vertices[i];
-            if (this.isTransporting) {
-                this.transportByMax(particle); 
-            }
-        }
-        this.particles.geometry.verticesNeedUpdate = true;
+    if (this.particles && this.isTransporting) {
+        this.transportByWeight();
     }
     this.renderer.render(scene, camera);
 }

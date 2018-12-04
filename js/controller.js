@@ -28,7 +28,7 @@ function Controller(startParticles, endParticles) {
             _this.startParticles.isTransporting = true;
             var startPoints = _this.startParticles.getPoints();
             var endPoints = _this.endParticles.getPoints();
-            _this.startParticles.setMapping(getWeights(startPoints, endPoints), endPoints);
+            _this.startParticles.setMappingByWeight(getWeights(startPoints, endPoints), endPoints);
         })
     };
 }
