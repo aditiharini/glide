@@ -71,15 +71,12 @@ Particles.prototype.setMappingByWeight = function(weights, endPoints) {
         this.scene.add(newParticles.particles);
         this.transportSets.push(newParticles);
     }
-    this.transportSets[0].particles.geometry.vertices[0].name = "hi";
-    this.transportSets[1].particles.geometry.vertices[0].name = "bye";
-    console.log(this.transportSets[0].particles.geometry.vertices[0].name);
 }
 
 Particles.prototype.transport = function(particle) {
     var dist = distance(particle.dest, particle);
-    particle.velocity.x = (particle.dest.x - particle.x) / dist;
-    particle.velocity.y = (particle.dest.y - particle.y) / dist;
+    particle.velocity.x = 1000 * particle.destWeight * (particle.dest.x - particle.x) / dist;
+    particle.velocity.y = 1000 * particle.destWeight * (particle.dest.y - particle.y) / dist;
     particle.add(particle.velocity);
 }
 
