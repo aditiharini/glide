@@ -49,16 +49,57 @@ Particles.prototype.moveParticles = function(letters) {
     return this;
 }
 
-Particles.prototype.setMapping = function(weights, endPoints) {
+Particles.prototype.setMappingByMax = function(weights, endPoints) {
     var weights = maxByRow(weights);
     for (var i = 0; i < this.numParticles; i++) {
         var startPoint = this.particles.geometry.vertices[i];
         var endPoint = endPoints[weights[i]];
         var distance = Math.sqrt(Math.pow(endPoint.y-startPoint.y, 2) + Math.pow(endPoint.x-startPoint.x, 2));
         startPoint.dest = endPoint;
+        startPoint.destWeight = 1;
         startPoint.velocity.x = (endPoint.x - startPoint.x) / distance;
         startPoint.velocity.y = (endPoint.y - startPoint.y) / distance;
     }
+}
+
+Particles.prototype.setMappingByWeight = function(weights, endPoints) {
+    this.transportSets = [];
+    for (var i = 0; i < weights[0].length; i++) {
+        var newParticles = this.clone();
+        var endPoint = endPoints[i];
+        for (var j = 0; j < this.numParticles; j++) {
+            newParticles.particles.geometry.vertices[j].destWeight = weights[j][i];
+            newParticles.particles.geometry.vertices[j].dest = endPoint; 
+        }
+        this.transportSets.push(newParticles);
+    }
+}
+
+Particles.prototype.transport = function(particle) {
+    var distance = distance(particle.dest, particle);
+    particle.velocity.x = (particle.dest.x - particle.x) / distance;
+    particle.velocity.y = (particle.dest.y - particle.y) / distance;
+    particle.add(particle.velocity)
+}
+
+Particles.prototype.transportByMax = function () {
+    this.particles.geometry.vertices.forEach(particle=> {
+        this.transport(particle);
+    });
+}
+
+Particles.prototype.transportByWeight = function () {
+    this.transportSets.forEach(particles => {
+        particles.geometry.vertices.forEach(particle => {
+            this.transport(particle); 
+        });
+    });
+}
+
+Particles.prototype.clone = function() {
+    newParticles = new Particles(this.renderer, this.scene, this.camera, this.numParticles);
+    newParticles.particles = this.particles.clone();
+    return newParticles;
 }
 
 Particles.prototype.drawParticles = function() {
@@ -66,10 +107,7 @@ Particles.prototype.drawParticles = function() {
         for (var i = 0; i < this.numParticles; i++) {
             var particle = this.particles.geometry.vertices[i];
             if (this.isTransporting) {
-                var distance = Math.sqrt(Math.pow(particle.dest.y-particle.y, 2) + Math.pow(particle.dest.x-particle.x, 2));
-                particle.velocity.x = (particle.dest.x - particle.x) / distance;
-                particle.velocity.y = (particle.dest.y - particle.y) / distance;
-                particle.add(particle.velocity)
+                this.transportByMax(particle); 
             }
         }
         this.particles.geometry.verticesNeedUpdate = true;
@@ -80,19 +118,6 @@ Particles.prototype.drawParticles = function() {
 Particles.prototype.getCount = function() {
     return this.numParticles;
 }
-
-/**
- * Set a new particle count. This is a minimum and the actual count
- * may be slightly higher to fill out a texture.
- * @param {number} n
- * @returns {Particles} this
- */
-Particles.prototype.setCount = function(n) {
-    var tw = Math.ceil(Math.sqrt(n)),
-        th = Math.floor(Math.sqrt(n));
-    this.statesize = new Float32Array([tw, th]);
-    return this;
-};
 
 Particles.prototype.setText = function(newLetters) {
     this.letters = newLetters;

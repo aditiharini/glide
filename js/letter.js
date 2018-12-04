@@ -18,8 +18,6 @@ Letters.prototype.getHeight = function() {
 }
 
 Letters.prototype.samplePoints = function(numPoints) {
-    console.log("in samplepoints");
-    console.log(this.shape);
     return THREE.GeometryUtils.randomPointsInGeometry(this.shape, numPoints)
 }
 

@@ -12,25 +12,6 @@ function Controller(startParticles, endParticles) {
     var _this = this;
 
     this.controls = {
-        increase: $('.controls .increase').on('click', function() {
-            _this.adjust(2);
-        }),
-        decrease: $('.controls .decrease').on('click', function() {
-            _this.adjust(0.5);
-        }),
-        pcolor: $('.controls .particles .color').on('change', function(event) {
-            var value = $(event.target).val();
-            _this.particles.color = Controller.parseColor(value);
-        }),
-        reset: $('.controls .reset').on('click', function() {
-            _this.adjust(1);
-        }),
-        psize: $('.controls .particles .size').on('input', function() {
-            _this.particles.size = Number($(this).val());
-        }),
-        clear: $('.controls .clear').on('click', function() {
-            _this.clear();
-        }),
         startText: $('.controls .start').on('keyup', function() {
             var newText = $(this).val();
             if (newText != ""){
@@ -71,27 +52,3 @@ Controller.prototype.changeText = function(particles, newText) {
         }
     );
 }
-
-/**
- * Immediately adjust the particle count.
- * @param {number} factor multiplies the particle count
- * @returns {Controller} this
- */
-Controller.prototype.adjust = function(factor) {
-    var current = this.particles.getCount();
-    this.particles.setCount(Math.max(1, current * factor));
-    updateCount();
-};
-
-
-/**
- * @param {string} color
- * @returns {Array} a 4-element color array
- */
-Controller.parseColor = function(color) {
-    var colors = /#(..)(..)(..)/.exec(color).slice(1).map(function(x) {
-        return parseInt(x, 16) / 255;
-    });
-    colors.push(1);
-    return colors;
-};
