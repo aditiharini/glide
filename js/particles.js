@@ -4,6 +4,7 @@ function Particles(renderer, scene, camera, numParticles) {
     this.numParticles = numParticles;
     this.camera = camera;  
     this.isTransporting = false;
+    this.transportMode = null;
 }
 
 Particles.prototype.getWidth = function() {
@@ -115,7 +116,11 @@ Particles.prototype.clone = function() {
 
 Particles.prototype.drawParticles = function() {
     if (this.particles && this.isTransporting) {
-        this.transportByMax();
+        if (this.transportMode == TransportMode.MAX){
+            this.transportByMax();
+        } else {
+            this.transportByWeight();
+        }
     }
     this.renderer.render(scene, camera);
 }

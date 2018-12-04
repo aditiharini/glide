@@ -1,5 +1,8 @@
 /*global updateCount x*/
-
+var TransportMode = {
+    MAX: 1,
+    WEIGHTED: 2
+}
 /**
  * User interface connection to the simulation.
  * @constructor
@@ -28,7 +31,16 @@ function Controller(startParticles, endParticles) {
             _this.startParticles.isTransporting = true;
             var startPoints = _this.startParticles.getPoints();
             var endPoints = _this.endParticles.getPoints();
-            _this.startParticles.setMappingByMax(getWeights(startPoints, endPoints), endPoints);
+            var mode = $('.controls .mode option:selected').text();
+            console.log(mode);
+            if (mode == "Max") {
+                _this.startParticles.transportMode = TransportMode.MAX;
+                _this.startParticles.setMappingByMax(getWeights(startPoints, endPoints), endPoints);
+            } 
+            else {
+                _this.startParticles.transportMode = TransportMode.WEIGHTED;
+                _this.startParticles.setMappingByWeight(getWeights(startPoints, endPoints), endPoints);
+            }
         })
     };
 }
