@@ -56,11 +56,13 @@ Controller.prototype.changeText = function(particles, newText) {
             letters.scaleToFit(canvasWidth, canvasHeight);
             if (particles == this.startParticles) {
                 letters.translate(-letters.getWidth()/2, 50); 
-                particles.setText(letters, 0xFF0000);
+                particles.setColor(0xFF0000);
+                particles.setText(letters);
             }
             else {
                 letters.translate(-letters.getWidth()/2, -letters.getHeight()); 
-                particles.setText(letters, 0xFFFFFF);
+                particles.setColor(0xFFFFFF);
+                particles.setText(letters);
             } 
         }
     );
