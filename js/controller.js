@@ -28,7 +28,7 @@ function Controller(startParticles, endParticles) {
             _this.startParticles.isTransporting = true;
             var startPoints = _this.startParticles.getPoints();
             var endPoints = _this.endParticles.getPoints();
-            _this.startParticles.setMappingByWeight(getWeights(startPoints, endPoints), endPoints);
+            _this.startParticles.setMappingByMax(getWeights(startPoints, endPoints), endPoints);
         })
     };
 }
@@ -44,11 +44,12 @@ Controller.prototype.changeText = function(particles, newText) {
             letters.scaleToFit(canvasWidth, canvasHeight);
             if (particles == this.startParticles) {
                 letters.translate(-letters.getWidth()/2, 50); 
+                particles.setText(letters, 0xFF0000);
             }
             else {
                 letters.translate(-letters.getWidth()/2, -letters.getHeight()); 
+                particles.setText(letters, 0xFFFFFF);
             } 
-            particles.setText(letters);
         }
     );
 }
