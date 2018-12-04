@@ -2,8 +2,9 @@ function Particles(renderer, scene, camera, numParticles) {
     this.renderer = renderer;
     this.scene = scene;
     this.numParticles = numParticles;
-    this.camera = camera;  
+    this.camera = camera;
     this.isTransporting = false;
+    this.isStart = true;
 }
 
 Particles.prototype.getWidth = function() {
@@ -18,10 +19,16 @@ Particles.prototype.getPoints = function() {
     return this.particles.geometry.vertices;
 }
 
+Particles.prototype.setColor = function() {
+  if (this.isStart) { return 0xFF0000}
+  else {return  0xFFFFFF}
+}
+
 Particles.prototype.createParticles = function(letters, numParticles) {
+    var color = this.setColor();
     var geom = new THREE.Geometry(),
         mat = new THREE.ParticleBasicMaterial({
-            color: 0xFFFFFF,
+            color: color,
             size: 1
         });
     var particles = new THREE.Points(geom, mat);
@@ -66,7 +73,7 @@ Particles.prototype.setMappingByWeight = function(weights, endPoints) {
         var endPoint = endPoints[i];
         for (var j = 0; j < this.numParticles; j++) {
             newParticles.particles.geometry.vertices[j].destWeight = weights[j][i];
-            newParticles.particles.geometry.vertices[j].dest = endPoint; 
+            newParticles.particles.geometry.vertices[j].dest = endPoint;
         }
         this.scene.add(newParticles.particles);
         this.transportSets.push(newParticles);
@@ -98,9 +105,10 @@ Particles.prototype.transportByWeight = function () {
 
 Particles.prototype.clone = function() {
     newParticles = new Particles(this.renderer, this.scene, this.camera, this.numParticles);
+    var color = this.setColor();
     var geom = new THREE.Geometry(),
         mat = new THREE.ParticleBasicMaterial({
-        color: 0xFFFFFF,
+        color: color,
         size: 1
     });
     newParticles.particles = new THREE.Points(geom, mat);
@@ -130,5 +138,3 @@ Particles.prototype.setText = function(newLetters) {
     this.drawParticles();
     return this;
 }
-
-

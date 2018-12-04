@@ -7,6 +7,7 @@
 function Controller(startParticles, endParticles) {
     this.startParticles = startParticles;
     this.endParticles = endParticles;
+    this.endParticles.isStart=false;
     this.mousedown = false;
 
     var _this = this;
@@ -38,16 +39,16 @@ Controller.prototype.changeText = function(particles, newText) {
     loader.load(
         '../fonts/helvetiker_bold.typeface.json',
         function ( font ) {
-            var letters = new Letters(newText, font); 
+            var letters = new Letters(newText, font);
             var canvasWidth = particles.getWidth();
             var canvasHeight = particles.getHeight();
             letters.scaleToFit(canvasWidth, canvasHeight);
             if (particles == this.startParticles) {
-                letters.translate(-letters.getWidth()/2, letters.getHeight()); 
+                letters.translate(-letters.getWidth()/2, letters.getHeight());
             }
             else {
-                letters.translate(-letters.getWidth()/2, -letters.getHeight()); 
-            } 
+                letters.translate(-letters.getWidth()/2, -letters.getHeight());
+            }
             particles.setText(letters);
         }
     );
