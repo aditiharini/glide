@@ -100,7 +100,7 @@ Particles.prototype.clone = function() {
     newParticles = new Particles(this.renderer, this.scene, this.camera, this.numParticles);
     var geom = new THREE.Geometry(),
         mat = new THREE.ParticleBasicMaterial({
-        color: 0xFFFFFF,
+        color: Math.random() * 0xFFFFFF,
         size: 1
     });
     newParticles.particles = new THREE.Points(geom, mat);
