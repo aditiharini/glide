@@ -1,4 +1,9 @@
-
+var Colors = {
+  BLUE: 0x0000ff,
+  RED: 0xff0000,
+  WHITE:0xffffff,
+  GREEN:0x00ff00
+}
 
 function Particles(renderer, scene, camera, numParticles) {
     this.renderer = renderer;
@@ -13,7 +18,12 @@ function Particles(renderer, scene, camera, numParticles) {
     this.transparent = true;
     this.opacity = null;
     this.isStart = false;
+    this.colorProbability = 0.5;
 }
+
+Particles.prototype.getColorProbability = function() {
+     return !!this.colorProbability && Math.random() <= this.colorProbability;
+};
 
 Particles.prototype.getWidth = function() {
     return this.renderer.getSize().width;
@@ -29,6 +39,14 @@ Particles.prototype.getPoints = function() {
 
 Particles.prototype.getVertex = function(i) {
     return this.particles.geometry.vertices[i];
+}
+
+Particles.prototype.determineColor = function() {
+  if (this.getColorProbability()) {
+    return new THREE.Color(Colors.GREEN);
+  } else {
+    return new THREE.Color(Colors.BLUE);
+  }
 }
 
 Particles.prototype.getVertexColor = function(i) {
@@ -103,8 +121,9 @@ Particles.prototype.createParticles = function(letters, numParticles) {
         var point = new THREE.Vector3(points[i].x, points[i].y, 0)
         point.velocity = new THREE.Vector3(0, 0, 0);
         this.pushVertex(point);
-        // set color
-        this.pushVertexColor(new THREE.Color(Math.random(), Math.random(), Math.random()));
+        
+        var color = this.determineColor();
+        this.pushVertexColor(color);
     }
     this.applyVertexColors();
     this.applyVertexVelocities()

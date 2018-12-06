@@ -1,18 +1,26 @@
-var euclideanDistance2 = function(p1,p2) {
+var euclideanDistance2 = function(ps1,ps2,i,j) {
+  d1 = ps1.getPoints();
+  d2 = ps2.getPoints();
+  var p1 = d1[i];
+  var p2 = d2[j];
   return Math.pow((p1.x- p2.x), 2) + Math.pow(p1.y- p2.y, 2);
 }
 
-var colorCost = function(p1,p2) {
-  // console.log(p1);
-  return 0
+var colorCost = function(ps1,ps2,i,j) {
+  // this.particles.geometry.colors.
+  var c1 = ps1.particles.geometry.colors[i];
+  var c2 = ps2.particles.geometry.colors[j];
+  return Math.pow((c1.r-c2.r), 2) + Math.pow((c1.g-c2.g), 2) + Math.pow((c1.b-c2.b), 2);
 }
 
-var generateCosts = function(d1,d2, costFunction, scalar) {
+var generateCosts = function(ps1,ps2, costFunction, scalar) {
+  d1 = ps1.getPoints();
+  d2 = ps2.getPoints();
   var costExpMatrix = [];
   for (var i=0; i<d1.length;i++) {
     costExpMatrix[i] = []
     for (var j=0; j<d2.length; j++) {
-      dist = costFunction(d1[i], d2[j]);
+      dist = costFunction(ps1, ps2, i, j);
       exp = -1* dist * scalar
       val = Math.pow(Math.E,exp);
       costExpMatrix[i][j] =val;
@@ -65,9 +73,11 @@ var sinkhorn = function(m, scaleRow=true, err=1.0, i=0, timeout=100, stopThres=1
   return m;
 }
 
-var getWeights = function(d1,d2,costMode) {
+var getWeights = function(ps1,ps2,costMode) {
+  // var d1 = ps1.getPoints()
+  // var d2 = ps2.getPoints()
   var costFunction = (costMode == Cost.DISTANCE) ? euclideanDistance2 : colorCost;
-  var costs = generateCosts(d1,d2, costFunction, 0.00005);
+  var costs = generateCosts(ps1,ps2, costFunction, 0.00005);
   var m = sinkhorn(costs);
   return m;
 }

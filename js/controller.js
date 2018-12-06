@@ -78,11 +78,17 @@ function Controller(startParticles, endParticles) {
             }
             if (mode == "Max") {
                 _this.startParticles.transportMode = TransportMode.MAX;
-                _this.startParticles.setMappingByMax(getWeights(startPoints, endPoints,_this.startParticles.costCalculation), endPoints);
+                _this.startParticles.setMappingByMax(
+                  getWeights(_this.startParticles,
+                             _this.endParticles,
+                             _this.startParticles.costCalculation), endPoints);
             }
             else {
                 _this.startParticles.transportMode = TransportMode.WEIGHTED;
-                _this.startParticles.setMappingByWeight(getWeights(startPoints, endPoints, _this.startParticles.costCalculation), endPoints);
+                _this.startParticles.setMappingByWeight(
+                  getWeights(_this.startParticles,
+                             _this.endParticles,
+                             _this.startParticles.costCalculation), endPoints);
             }
         })
     };
