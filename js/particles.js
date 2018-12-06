@@ -24,30 +24,82 @@ Particles.prototype.getPoints = function() {
     return this.particles.geometry.vertices;
 }
 
+Particles.prototype.getVertex = function(i) {
+    return this.particles.geometry.vertices[i];
+}
+
+Particles.prototype.setVertexColor = function(i, color) {
+    this.particles.geometry.colors[i] = color;
+}
+
+Particles.prototype.pushVertexColor = function(color) {
+    this.particles.geometry.colors.push(color);
+}
+
+Particles.prototype.setVertexVelocity = function(i, velocity) {
+    this.getVertex(i).velocity = velocity;
+}
+
+Particles.prototype.setVertexPosition = function(i, position) {
+    var vert = this.getVertex(i);
+    vert.x = position.x;
+    vert.y = position.y;
+    vert.z = position.z;
+}
+
+Particles.prototype.pushVertex = function(vertex) {
+    this.particles.geometry.vertices.push(vertex);
+}
+
+Particles.prototype.applyVertexVelocities = function () {
+    this.particles.geometry.verticesNeedUpdate = true;
+}
+
+Particles.prototype.applyVertexColors = function () {
+    this.particles.geometry.colorsNeedUpdate = true;
+}
+
+Particles.prototype.setVertexWeight= function(i, weight) {
+    this.getVertex(i).destWeight = weight;
+}
+
+Particles.prototype.getVertexWeight= function(i, weight) {
+    return this.getVertex(i).destWeight; 
+}
+
+Particles.prototype.setVertexDestination = function(i, dest) {
+    this.getVertex(i).dest = dest;
+}
+
+Particles.prototype.getVertexDestination = function(i, dest) {
+    return this.getVertex(i).dest;
+}
+
+Particles.prototype.moveParticle = function(i) {
+    var particle = this.getVertex(i);
+    particle.add(particle.velocity);
+}
+
 Particles.prototype.createParticles = function(letters, numParticles) {
     var geom = new THREE.Geometry(),
         mat = new THREE.PointsMaterial({
-            color: this.color,
             size: this.size,
+            vertexColors: THREE.VertexColors
             // transparent: this.transparent,
             // opacity: this.opacity
         });
     var particles = new THREE.Points(geom, mat);
-    console.log(particles);
     this.particles = particles;
     this.scene.add(particles);
     var points = letters.samplePoints(numParticles);
     for (var i = 0; i < numParticles; i++) {
         var point = new THREE.Vector3(points[i].x, points[i].y, 0)
-        point.velocity = new THREE.Vector3(Math.random()-0.5, Math.random()-0.5)
-        geom.vertices.push(point);
-        // varying color testing
-        // var rnd = Math.random() / 2 + 0.5;
-        // this.particles.geometry.colors[i] = new THREE.Color(rnd, rnd / 4, 0);
+        point.velocity = new THREE.Vector3(0, 0, 0);
+        this.pushVertex(point);
+        this.pushVertexColor(new THREE.Color(Math.random(), Math.random(), Math.random()));
     }
-      // this.particles.geometry.colorsNeedUpdate = true;
-      this.particles.geometry.verticesNeedUpdate = true;
-      console.log(this.particles.geometry)
+    this.applyVertexColors();
+    this.applyVertexVelocities()
 }
 
 Particles.prototype.moveParticles = function(letters) {
@@ -57,24 +109,18 @@ Particles.prototype.moveParticles = function(letters) {
     }
     var points = letters.samplePoints(this.numParticles);
     for (var i = 0; i < this.numParticles; i++) {
-        this.particles.geometry.vertices[i].x = points[i].x;
-        this.particles.geometry.vertices[i].y = points[i].y;
-        // var rnd = Math.random() / 2 + 0.5;
-        // this.particles.materials[i].color.setHex( 0x0000ff );
-        // this.particles.geometry.colors[i] = new THREE.Color(rnd, rnd / 4, 0);
+        this.setVertexPosition(i, points[i]);
     }
-    this.particles.geometry.verticesNeedUpdate = true;
-      // this.particles.geometry.colorsNeedUpdate = true;
+    this.applyVertexVelocities();
     return this;
 }
 
 Particles.prototype.setMappingByMax = function(weights, endPoints) {
     var weights = maxByRow(weights);
     for (var i = 0; i < this.numParticles; i++) {
-        var startPoint = this.particles.geometry.vertices[i];
         var endPoint = endPoints[weights[i]];
-        startPoint.dest = endPoint;
-        startPoint.destWeight = 1;
+        this.setVertexDestination(i, endPoint);
+        this.setVertexWeight(i, 1);
     }
 }
 
@@ -84,35 +130,42 @@ Particles.prototype.setMappingByWeight = function(weights, endPoints) {
         var newParticles = this.clone();
         var endPoint = endPoints[i];
         for (var j = 0; j < this.numParticles; j++) {
-            newParticles.particles.geometry.vertices[j].destWeight = weights[j][i];
-            newParticles.particles.geometry.vertices[j].dest = endPoint;
+            newParticles.setVertexWeight(j, weights[j][i]);
+            newParticles.setVertexDestination(j, endPoint)
         }
         this.scene.add(newParticles.particles);
         this.transportSets.push(newParticles);
     }
 }
 
-Particles.prototype.transport = function(particle, scaleFactor) {
-    var dist = distance(particle.dest, particle);
-    particle.velocity.x =  scaleFactor * particle.destWeight * (particle.dest.x - particle.x) / dist;
-    particle.velocity.y =  scaleFactor * particle.destWeight * (particle.dest.y - particle.y) / dist;
-    particle.add(particle.velocity);
+Particles.prototype.transport = function(particleNum, scaleFactor) {
+    var weight = this.getVertexWeight(particleNum);
+    var start = this.getVertex(particleNum);
+    var dest = this.getVertexDestination(particleNum);
+    var dist = distance(dest, start);
+    var newVelocity = new THREE.Vector3(
+        scaleFactor * weight * (dest.x - start.x) / dist,
+        scaleFactor * weight * (dest.y - start.y) / dist,
+        0
+    );
+    this.setVertexVelocity(particleNum, newVelocity);
+    this.moveParticle(particleNum);
 }
 
 
 Particles.prototype.transportByMax = function () {
     for (var i = 0; i < this.numParticles; i++) {
-        this.transport(this.particles.geometry.vertices[i], 1);
+        this.transport(i, 1);
     }
-    this.particles.geometry.verticesNeedUpdate = true;
+    this.applyVertexVelocities();
 }
 
 Particles.prototype.transportByWeight = function () {
     for (var i = 0; i < this.transportSets.length; i++) {
         for (var j = 0; j < this.numParticles; j++) {
-            this.transport(this.transportSets[i].particles.geometry.vertices[j], 1000);
+            this.transportSets[i].transport(j, 1000);
         }
-        this.transportSets[i].particles.geometry.verticesNeedUpdate = true;
+        this.transportSets[i].applyVertexVelocities();
     }
 }
 
@@ -120,17 +173,20 @@ Particles.prototype.clone = function() {
     newParticles = new Particles(this.renderer, this.scene, this.camera, this.numParticles);
     var geom = new THREE.Geometry(),
         mat = new THREE.ParticleBasicMaterial({
-        color: this.color,
+        vertexColors: THREE.VertexColors,
         size: this.size
         // transparent: this.transparent,
         // opacity: this.opacity
     });
     newParticles.particles = new THREE.Points(geom, mat);
     for (var i = 0; i < this.numParticles; i++) {
-        var oldParticle = this.particles.geometry.vertices[i];
-        newParticles.particles.geometry.vertices.push(new THREE.Vector3(oldParticle.x, oldParticle.y, 0));
-        newParticles.particles.geometry.vertices[i].velocity = new THREE.Vector3(0, 0, 0);
+        var oldVertex = this.getVertex(i);
+        var oldColor = this.particles.geometry.colors[i];
+        newParticles.pushVertex(new THREE.Vector3(oldVertex.x, oldVertex.y, 0));
+        newParticles.pushVertexColor(new THREE.Vector3(oldColor.r, oldColor.g, oldColor.b))
+        newParticles.setVertexVelocity(i, new THREE.Vector3(0, 0, 0));
     }
+    newParticles.applyVertexColors()
     return newParticles;
 }
 
