@@ -68,6 +68,9 @@ var sinkhorn = function(m, scaleRow=true, err=1.0, i=0, timeout=100, stopThres=1
 var getWeights = function(d1,d2,costMode) {
   var costFunction = (costMode == Cost.DISTANCE) ? euclideanDistance2 : colorCost;
   var costs = generateCosts(d1,d2, costFunction, 0.00005);
+  var m = sinkhorn(costs);
+  return m;
+}
 
 function argMax(array) {
   return array.map((x, i) => [x, i]).reduce((r, a) => (a[0] > r[0] ? a : r))[1];
