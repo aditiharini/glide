@@ -5,6 +5,7 @@ function Particles(renderer, scene, camera, numParticles) {
     this.camera = camera;
     this.isTransporting = false;
     this.transportMode = null;
+    this.costCalculation = null;
     this.color = null;
     this.size = null;
     this.transparent = true;

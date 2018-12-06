@@ -3,6 +3,11 @@ var TransportMode = {
     MAX: 1,
     WEIGHTED: 2
 }
+
+var Cost = {
+  DISTANCE: 1,
+  COLOR: 2
+}
 /**
  * User interface connection to the simulation.
  * @constructor
@@ -28,25 +33,26 @@ function Controller(startParticles, endParticles) {
                 _this.changeText(_this.endParticles, newText)
             }
         }),
-        // particleSize: $('.controls .size').on('keyup', function() {
-        //     var size = $(this).val();
-        //     if (size != "") {
-        //         _this.changeText(_this.endParticles, size)
-        //     }
-        // }),
         moveText: $('.controls .move').on('click', function() {
             _this.startParticles.isTransporting = true;
             var startPoints = _this.startParticles.getPoints();
             var endPoints = _this.endParticles.getPoints();
             var mode = $('.controls .mode option:selected').text();
+            var cost = $('.controls .cost option:selected').text();
             console.log(mode);
+            console.log(cost);
+            if (cost == "distance") {
+              _this.startParticles.costCalculation = Cost.DISTANCE;
+            } else {
+              _this.startParticles.costCalculation = Cost.COLOR;
+            }
             if (mode == "Max") {
                 _this.startParticles.transportMode = TransportMode.MAX;
-                _this.startParticles.setMappingByMax(getWeights(startPoints, endPoints), endPoints);
+                _this.startParticles.setMappingByMax(getWeights(startPoints, endPoints,_this.startParticles.costCalculation), endPoints);
             }
             else {
                 _this.startParticles.transportMode = TransportMode.WEIGHTED;
-                _this.startParticles.setMappingByWeight(getWeights(startPoints, endPoints), endPoints);
+                _this.startParticles.setMappingByWeight(getWeights(startPoints, endPoints, _this.startParticles.costCalculation), endPoints);
             }
         })
     };

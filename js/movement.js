@@ -1,23 +1,9 @@
-// var generateExpCosts = function(d1,d2) {
-//   var scalar = 0.00005;
-//   var costExpMatrix = [];
-//   for (var i=0; i<d1.length;i++) {
-//     costExpMatrix[i] = []
-//     for (var j=0; j<d2.length; j++) {
-//       dist = Math.pow((d1[i].x- d2[j].x), 2) + Math.pow(d1[i].y- d2[j].y, 2);
-//       exp = -1* dist * scalar
-//       val = Math.pow(Math.E,exp);
-//       costExpMatrix[i][j] =val;
-//     }
-//   }
-//   return costExpMatrix;
-// }
-
 var euclideanDistance2 = function(p1,p2) {
   return Math.pow((p1.x- p2.x), 2) + Math.pow(p1.y- p2.y, 2);
 }
 
 var colorCost = function(p1,p2) {
+  console.log(p1.color);
   return 0
 }
 
@@ -79,8 +65,9 @@ var sinkhorn = function(m, scaleRow=true, err=1.0, i=0, timeout=100, stopThres=1
   return m;
 }
 
-var getWeights = function(d1,d2) {
-  var costs = generateCosts(d1,d2, euclideanDistance2, 0.00005);
+var getWeights = function(d1,d2,costMode) {
+  var costFunction = (costMode == Cost.DISTANCE) ? euclideanDistance2 : colorCost;
+  var costs = generateCosts(d1,d2, costFunction, 0.00005);
   var m = sinkhorn(costs);
   return m;
 }
