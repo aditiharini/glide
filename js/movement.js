@@ -7,7 +7,6 @@ var euclideanDistance2 = function(ps1,ps2,i,j) {
 }
 
 var colorCost = function(ps1,ps2,i,j) {
-  // this.particles.geometry.colors.
   var c1 = ps1.particles.geometry.colors[i];
   var c2 = ps2.particles.geometry.colors[j];
   return Math.pow((c1.r-c2.r), 2) + Math.pow((c1.g-c2.g), 2) + Math.pow((c1.b-c2.b), 2);
