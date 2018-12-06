@@ -1,3 +1,5 @@
+
+
 function Particles(renderer, scene, camera, numParticles) {
     this.renderer = renderer;
     this.scene = scene;
@@ -10,6 +12,7 @@ function Particles(renderer, scene, camera, numParticles) {
     this.size = null;
     this.transparent = true;
     this.opacity = null;
+    this.isStart = false;
 }
 
 Particles.prototype.getWidth = function() {
@@ -68,7 +71,7 @@ Particles.prototype.setVertexWeight= function(i, weight) {
 }
 
 Particles.prototype.getVertexWeight= function(i, weight) {
-    return this.getVertex(i).destWeight; 
+    return this.getVertex(i).destWeight;
 }
 
 Particles.prototype.setVertexDestination = function(i, dest) {
@@ -100,6 +103,7 @@ Particles.prototype.createParticles = function(letters, numParticles) {
         var point = new THREE.Vector3(points[i].x, points[i].y, 0)
         point.velocity = new THREE.Vector3(0, 0, 0);
         this.pushVertex(point);
+        // set color
         this.pushVertexColor(new THREE.Color(Math.random(), Math.random(), Math.random()));
     }
     this.applyVertexColors();

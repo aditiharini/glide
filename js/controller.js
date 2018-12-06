@@ -9,6 +9,35 @@ var Cost = {
   COLOR: 2
 }
 
+var test = function() {
+// instantiate a loader
+// var loader = new THREE.OBJLoader();
+
+// load a resource
+loader.load(
+	// resource URL
+	'objs/bigmax.obj',
+	// called when resource is loaded
+	function ( object ) {
+
+		scene.add( object );
+
+	},
+	// called when loading is in progresses
+	function ( xhr ) {
+
+		console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+	},
+	// called when loading has errors
+	function ( error ) {
+
+		console.log( 'An error happened' );
+
+	}
+);
+}
+
 /**
  * User interface connection to the simulation.
  * @constructor
@@ -17,8 +46,7 @@ function Controller(startParticles, endParticles) {
     this.startParticles = startParticles;
     this.endParticles = endParticles;
     this.mousedown = false;
-
-
+    // test()
     var _this = this;
 
     this.controls = {

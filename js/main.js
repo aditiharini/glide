@@ -44,6 +44,7 @@ $(document).ready(function() {
   	renderer.setSize(WIDTH, HEIGHT);
     document.body.appendChild(renderer.domElement);
     startParticles = new Particles(renderer, scene, camera, 1000);
+    startParticles.isStart = true;
     endParticles = new Particles(renderer, scene, camera, 1000);
     controller = new Controller(startParticles, endParticles);
     render()
