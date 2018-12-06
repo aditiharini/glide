@@ -172,7 +172,7 @@ Particles.prototype.transportByWeight = function () {
 Particles.prototype.clone = function() {
     newParticles = new Particles(this.renderer, this.scene, this.camera, this.numParticles);
     var geom = new THREE.Geometry(),
-        mat = new THREE.ParticleBasicMaterial({
+        mat = new THREE.PointsMaterial({
         vertexColors: THREE.VertexColors,
         size: this.size
         // transparent: this.transparent,
