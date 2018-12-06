@@ -17,8 +17,8 @@ function Particles(renderer, scene, camera, numParticles) {
     this.size = null;
     this.transparent = true;
     this.opacity = null;
-    this.isStart = false;
     this.colorProbability = 0.5;
+    this.enableGravity = false; 
 }
 
 Particles.prototype.getColorProbability = function() {

@@ -69,8 +69,6 @@ function Controller(startParticles, endParticles) {
             var mode = $('.controls .mode option:selected').text();
             var cost = $('.controls .cost option:selected').text();
             // add obj file loading option
-            console.log(mode);
-            console.log(cost);
             if (cost == "distance") {
               _this.startParticles.costCalculation = Cost.DISTANCE;
             } else {
