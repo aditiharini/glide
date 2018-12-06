@@ -8,6 +8,7 @@ var Cost = {
   DISTANCE: 1,
   COLOR: 2
 }
+
 /**
  * User interface connection to the simulation.
  * @constructor
@@ -39,6 +40,7 @@ function Controller(startParticles, endParticles) {
             var endPoints = _this.endParticles.getPoints();
             var mode = $('.controls .mode option:selected').text();
             var cost = $('.controls .cost option:selected').text();
+            // add obj file loading option
             console.log(mode);
             console.log(cost);
             if (cost == "distance") {

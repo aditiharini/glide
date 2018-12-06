@@ -26,13 +26,14 @@ Particles.prototype.getPoints = function() {
 
 Particles.prototype.createParticles = function(letters, numParticles) {
     var geom = new THREE.Geometry(),
-        mat = new THREE.ParticleBasicMaterial({
+        mat = new THREE.PointsMaterial({
             color: this.color,
             size: this.size,
             // transparent: this.transparent,
             // opacity: this.opacity
         });
     var particles = new THREE.Points(geom, mat);
+    console.log(particles);
     this.particles = particles;
     this.scene.add(particles);
     var points = letters.samplePoints(numParticles);
@@ -40,7 +41,13 @@ Particles.prototype.createParticles = function(letters, numParticles) {
         var point = new THREE.Vector3(points[i].x, points[i].y, 0)
         point.velocity = new THREE.Vector3(Math.random()-0.5, Math.random()-0.5)
         geom.vertices.push(point);
+        // varying color testing
+        // var rnd = Math.random() / 2 + 0.5;
+        // this.particles.geometry.colors[i] = new THREE.Color(rnd, rnd / 4, 0);
     }
+      // this.particles.geometry.colorsNeedUpdate = true;
+      this.particles.geometry.verticesNeedUpdate = true;
+      console.log(this.particles.geometry)
 }
 
 Particles.prototype.moveParticles = function(letters) {
@@ -52,8 +59,12 @@ Particles.prototype.moveParticles = function(letters) {
     for (var i = 0; i < this.numParticles; i++) {
         this.particles.geometry.vertices[i].x = points[i].x;
         this.particles.geometry.vertices[i].y = points[i].y;
+        // var rnd = Math.random() / 2 + 0.5;
+        // this.particles.materials[i].color.setHex( 0x0000ff );
+        // this.particles.geometry.colors[i] = new THREE.Color(rnd, rnd / 4, 0);
     }
     this.particles.geometry.verticesNeedUpdate = true;
+      // this.particles.geometry.colorsNeedUpdate = true;
     return this;
 }
 

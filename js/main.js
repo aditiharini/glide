@@ -41,7 +41,7 @@ $(document).ready(function() {
     camera.position.set( 0.0, 200, 300);
     renderer = new THREE.WebGLRenderer();
     renderer.setClearColor(new THREE.Color(0, 0, 0));
-	renderer.setSize(WIDTH, HEIGHT);
+  	renderer.setSize(WIDTH, HEIGHT);
     document.body.appendChild(renderer.domElement);
     startParticles = new Particles(renderer, scene, camera, 1000);
     endParticles = new Particles(renderer, scene, camera, 1000);

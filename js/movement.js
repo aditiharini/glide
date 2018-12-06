@@ -3,7 +3,7 @@ var euclideanDistance2 = function(p1,p2) {
 }
 
 var colorCost = function(p1,p2) {
-  console.log(p1.color);
+  // console.log(p1);
   return 0
 }
 
