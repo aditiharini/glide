@@ -28,6 +28,10 @@ Particles.prototype.getVertex = function(i) {
     return this.particles.geometry.vertices[i];
 }
 
+Particles.prototype.getVertexColor = function(i) {
+    return this.particles.geometry.colors[i];
+}
+
 Particles.prototype.setVertexColor = function(i, color) {
     this.particles.geometry.colors[i] = color;
 }
@@ -166,6 +170,7 @@ Particles.prototype.transportByWeight = function () {
             this.transportSets[i].transport(j, 1000);
         }
         this.transportSets[i].applyVertexVelocities();
+        this.transportSets[i].applyVertexColors();
     }
 }
 
@@ -181,10 +186,10 @@ Particles.prototype.clone = function() {
     newParticles.particles = new THREE.Points(geom, mat);
     for (var i = 0; i < this.numParticles; i++) {
         var oldVertex = this.getVertex(i);
-        var oldColor = this.particles.geometry.colors[i];
+        var oldColor = this.getVertexColor(i);
         newParticles.pushVertex(new THREE.Vector3(oldVertex.x, oldVertex.y, 0));
-        newParticles.pushVertexColor(new THREE.Vector3(oldColor.r, oldColor.g, oldColor.b))
         newParticles.setVertexVelocity(i, new THREE.Vector3(0, 0, 0));
+        newParticles.pushVertexColor(new THREE.Color(oldColor.r, oldColor.g, oldColor.b));
     }
     newParticles.applyVertexColors()
     return newParticles;
