@@ -36,6 +36,7 @@ HEIGHT = window.innerHeight;
 
 $(document).ready(function() {
     scene = new THREE.Scene();
+    
     // camera = new THREE.OrthographicCamera(WIDTH/-2, WIDTH/2, HEIGHT/2, HEIGHT/-2, 1, 1000);
     camera = new THREE.PerspectiveCamera(140, WIDTH/HEIGHT, 1, 1000);
     camera.position.set( 0.0, 0, 300);
