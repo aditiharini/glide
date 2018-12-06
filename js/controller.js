@@ -66,12 +66,14 @@ Controller.prototype.changeText = function(particles, newText) {
                 particles.setColor(0xFF0000);
                 particles.setSize(1);
                 particles.setText(letters);
+                particles.setOpacity(1.0);
             }
             else {
                 letters.translate(-letters.getWidth()/2, -letters.getHeight());
                 particles.setColor(0xFFFFFF);
                 particles.setSize(1);
                 particles.setText(letters);
+                particles.setOpacity(1.0);
             }
         }
     );
