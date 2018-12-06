@@ -7,6 +7,8 @@ function Particles(renderer, scene, camera, numParticles) {
     this.transportMode = null;
     this.color = null;
     this.size = null;
+    this.transparent = true;
+    this.opacity = null;
 }
 
 Particles.prototype.getWidth = function() {
@@ -25,7 +27,9 @@ Particles.prototype.createParticles = function(letters, numParticles) {
     var geom = new THREE.Geometry(),
         mat = new THREE.ParticleBasicMaterial({
             color: this.color,
-            size: 1
+            size: this.size,
+            // transparent: this.transparent,
+            // opacity: this.opacity
         });
     var particles = new THREE.Points(geom, mat);
     this.particles = particles;
@@ -105,7 +109,9 @@ Particles.prototype.clone = function() {
     var geom = new THREE.Geometry(),
         mat = new THREE.ParticleBasicMaterial({
         color: this.color,
-        size: 1
+        size: this.size
+        // transparent: this.transparent,
+        // opacity: this.opacity
     });
     newParticles.particles = new THREE.Points(geom, mat);
     for (var i = 0; i < this.numParticles; i++) {
@@ -133,6 +139,10 @@ Particles.prototype.getCount = function() {
 
 Particles.prototype.setColor = function(color) {
     this.color = color;
+}
+
+Particles.prototype.setOpacity = function(opacity) {
+  this.opacity = opacity;
 }
 
 Particles.prototype.setSize = function(size) {
