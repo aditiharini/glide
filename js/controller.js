@@ -16,24 +16,23 @@ var loadMeshCallback = function ( object ) {
 var loadMeshCallback2 = function ( object ) {
   var lg = 1000;  // num particles
     scene.add( object );
-    // object.traverse( function ( child ) {
-    // if ( child instanceof THREE.Mesh ) {
-    //     console.log (" === CHILD === ");
-    //     console.log (child.geometry);
-           // TODO: GETTING ERROR WITH GeometryUtils ("is not a constructor")
-    //     // var ex = new THREE.GeometryUtils();
-    //     // var randomPointPositions = ex.randomPointsInBufferGeometry( child.geometry, lg);
-    //     console.log (randomPointPositions[0].x, randomPointPositions[0].y, randomPointPositions[0].z );
-    //     for( var i = 0; i < randomPointPositions.length; i++ ){
-    //        var p = allParticle[i];
-    //        p.diffX = randomPointPositions[i].x * scale -p.x ;
-    //        p.diffY = randomPointPositions[i].y * scale -p.y;
-    //        p.diffZ = randomPointPositions[i].z * scale -p.z;
-    //     }
-    //     console.log("randomPointPositions");
-    //     console.log(randomPointPositions);
-    // }
-    // });
+    object.traverse( function ( child ) {
+    if ( child instanceof THREE.Mesh ) {
+        console.log (" === CHILD === ");
+        console.log (child.geometry);
+        // TODO: Errors with buffer geometry
+        // randomPointPositions = new THREE.GeometryUtils.randomPointsInBufferGeometry( child.geometry, lg);
+        // console.log (randomPointPositions[0].x, randomPointPositions[0].y, randomPointPositions[0].z );
+        // for( var i = 0; i < randomPointPositions.length; i++ ){
+        //    var p = allParticle[i];
+        //    p.diffX = randomPointPositions[i].x * scale -p.x ;
+        //    p.diffY = randomPointPositions[i].y * scale -p.y;
+        //    p.diffZ = randomPointPositions[i].z * scale -p.z;
+        // }
+      }
+    })
+        // console.log("randomPointPositions");
+        // console.log(randomPointPositions);
 }
 
 var inProgressCallback = function ( xhr ) {
@@ -55,9 +54,7 @@ function Controller(renderer, scene, camera, startParticles, endParticles) {
     this.startParticles = startParticles;
     this.endParticles = endParticles;
     this.mousedown = false;
-    // test()
     var _this = this;
-
     this.controls = {
         startText: $('.controls .start').on('keyup', function() {
             var newText = $(this).val();
