@@ -18,7 +18,9 @@ function Particles(renderer, scene, camera, numParticles) {
     this.transparent = true;
     this.opacity = null;
     this.colorProbability = 0.5;
-    this.enableGravity = false; 
+    this.forces = [];
+    this.timeStep = 0.3;
+    this.useRandomColors = false;
 }
 
 Particles.prototype.getColorProbability = function() {
@@ -100,6 +102,31 @@ Particles.prototype.getVertexDestination = function(i, dest) {
     return this.getVertex(i).dest;
 }
 
+Particles.prototype.setVertexAccl = function(i, accl) {
+    this.getVertex(i).accl = accl;
+}
+
+Particles.prototype.setUseRandomColors = function() {
+    this.useRandomColors = true;
+}
+
+Particles.prototype.applyForcesToVertex = function(i) {
+    var particle = this.getVertex(i);
+    for (var i = 0; i < this.forces.length; i++) {
+        this.forces[i].applyTo(particle);
+    }
+}
+
+Particles.prototype.eulerStepVertex = function(i) {
+    var particle = this.getVertex(i);
+    eulerStep(particle, particle.velocity, this.timeStep);
+    eulerStep(particle.velocity, particle.accl, this.timeStep);
+}
+
+Particles.prototype.addForce = function(force) {
+    this.forces.push(force);
+}
+
 Particles.prototype.moveParticle = function(i) {
     var particle = this.getVertex(i);
     particle.add(particle.velocity);
@@ -120,9 +147,12 @@ Particles.prototype.createParticles = function(letters, numParticles) {
     for (var i = 0; i < numParticles; i++) {
         var point = new THREE.Vector3(points[i].x, points[i].y, 0)
         point.velocity = new THREE.Vector3(0, 0, 0);
+        point.accl = new THREE.Vector3(0, 0, 0);
         this.pushVertex(point);
-        
-        var color = this.determineColor();
+        var color = this.color;
+        if (this.useRandomColors) {
+            var color = this.determineColor();
+        }
         this.pushVertexColor(color);
     }
     this.applyVertexColors();
@@ -169,14 +199,27 @@ Particles.prototype.transport = function(particleNum, scaleFactor) {
     var weight = this.getVertexWeight(particleNum);
     var start = this.getVertex(particleNum);
     var dest = this.getVertexDestination(particleNum);
-    var dist = distance(dest, start);
+    var dist = 0.5 * distance(dest, start);
     var newVelocity = new THREE.Vector3(
-        scaleFactor * weight * (dest.x - start.x) / dist,
-        scaleFactor * weight * (dest.y - start.y) / dist,
+        scaleFactor * weight * (dest.x - start.x),
+        scaleFactor * weight * (dest.y - start.y),
         0
     );
-    this.setVertexVelocity(particleNum, newVelocity);
-    this.moveParticle(particleNum);
+    this.getVertex(particleNum).accl = newVelocity;
+}
+
+Particles.prototype.eulerStep = function() {
+    for (var i = 0; i < this.numParticles; i++) {
+        this.applyForcesToVertex(i);
+        this.eulerStepVertex(i);
+    }
+    this.applyVertexVelocities();
+}
+
+Particles.prototype.resetAccel = function() {
+    for (var i = 0; i < this.numParticles; i++) {
+        this.setVertexAccl(i, new THREE.Vector3(0, 0, 0));
+    }
 }
 
 
@@ -225,6 +268,8 @@ Particles.prototype.drawParticles = function() {
         } else {
             this.transportByWeight();
         }
+        this.eulerStep();
+        this.resetAccel();
     }
     this.renderer.render(scene, camera);
 }

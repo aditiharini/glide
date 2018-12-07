@@ -11,6 +11,8 @@
     <script src="js/controller.js"></script>
     <script src="js/movement.js"></script>
     <script src="js/utils.js"></script>
+    <script src="js/force.js"></script>
+    <script src="js/integrator.js"></script>
     <script src="js/main.js"></script>
   </head>
   <body>
@@ -26,14 +28,15 @@
       <div class="mode">
         <label>Transport Mode:</label>
         <select class ="mode">
-          <option value="max">Max</option>
-          <option value="weighted">Weighted</option>
+          <option value="max">max</option>
+          <option value="weighted">weighted</option>
         </select>
       </div>
       <div class="force">
         <label>Forces:</label>
         <select class ="force">
-          <option value="gravity">Gravity</option>
+          <option value="gravity">gravity</option>
+          <option value="random">random</option>
         </select>
       </div>
       <div class="cost">

@@ -9,6 +9,14 @@ var Cost = {
   COLOR: 2
 }
 
+var ForceType = {
+    GRAVITY: 1,
+    RANDOM: 2
+}
+
+var GRAVITY = new THREE.Vector3(0, -9.8, 0);
+
+
 var test = function() {
 // instantiate a loader
 // var loader = new THREE.OBJLoader();
@@ -63,18 +71,20 @@ function Controller(startParticles, endParticles) {
             }
         }),
         moveText: $('.controls .move').on('click', function() {
-            _this.startParticles.isTransporting = true;
             var startPoints = _this.startParticles.getPoints();
             var endPoints = _this.endParticles.getPoints();
             var mode = $('.controls .mode option:selected').text();
             var cost = $('.controls .cost option:selected').text();
+            var force = $('.controls .force option:selected').text();
             // add obj file loading option
             if (cost == "distance") {
               _this.startParticles.costCalculation = Cost.DISTANCE;
             } else {
               _this.startParticles.costCalculation = Cost.COLOR;
+              _this.startParticles.setUseRandomColors();
+              _this.endParticles.setUseRandomColors();
             }
-            if (mode == "Max") {
+            if (mode == "max") {
                 _this.startParticles.transportMode = TransportMode.MAX;
                 _this.startParticles.setMappingByMax(
                   getWeights(_this.startParticles,
@@ -88,8 +98,27 @@ function Controller(startParticles, endParticles) {
                              _this.endParticles,
                              _this.startParticles.costCalculation), endPoints);
             }
+            if (force == "gravity") {
+                _this.handleForce(ForceType.GRAVITY);
+            } 
+            else {
+                _this.handleForce(ForceType.RANDOM);
+            }
+            _this.startParticles.isTransporting = true;
         })
     };
+}
+
+Controller.prototype.handleForce = function(type) {
+    if (type == ForceType.GRAVITY) {
+        this.startParticles.addForce(new Force(GRAVITY, null, null, null));
+    } else {
+        var force1 = new Force(new THREE.Vector3(Math.random()*5000, Math.random()*5000, 0), 
+                              new THREE.Vector3(10, 0, 0), 
+                              60, 
+                              5);
+        this.startParticles.addForce(force1);
+    }
 }
 
 Controller.prototype.changeText = function(particles, newText) {
@@ -103,18 +132,15 @@ Controller.prototype.changeText = function(particles, newText) {
             letters.scaleToFit(canvasWidth, canvasHeight);
             if (particles == this.startParticles) {
                 letters.translate(-letters.getWidth()/2, 50);
-                particles.setColor(0xFF0000);
-                particles.setSize(1);
-                particles.setText(letters);
-                particles.setOpacity(1.0);
+                particles.setColor(new THREE.Color(Colors.RED));
             }
             else {
                 letters.translate(-letters.getWidth()/2, -letters.getHeight());
-                particles.setColor(0xFFFFFF);
-                particles.setSize(1);
-                particles.setText(letters);
-                particles.setOpacity(1.0);
+                particles.setColor(new THREE.Color(Colors.WHITE));
             }
+            particles.setSize(1);
+            particles.setText(letters);
+            particles.setOpacity(1.0);
         }
     );
 }
