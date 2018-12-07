@@ -7,7 +7,6 @@ var euclideanDistance2 = function(ps1,ps2,i,j) {
 }
 
 var colorCost = function(ps1,ps2,i,j) {
-  // this.particles.geometry.colors.
   var c1 = ps1.particles.geometry.colors[i];
   var c2 = ps2.particles.geometry.colors[j];
   return Math.pow((c1.r-c2.r), 2) + Math.pow((c1.g-c2.g), 2) + Math.pow((c1.b-c2.b), 2);
@@ -74,8 +73,6 @@ var sinkhorn = function(m, scaleRow=true, err=1.0, i=0, timeout=100, stopThres=1
 }
 
 var getWeights = function(ps1,ps2,costMode) {
-  // var d1 = ps1.getPoints()
-  // var d2 = ps2.getPoints()
   var costFunction = (costMode == Cost.DISTANCE) ? euclideanDistance2 : colorCost;
   var costs = generateCosts(ps1,ps2, costFunction, 0.00005);
   var m = sinkhorn(costs);

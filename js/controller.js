@@ -16,47 +16,52 @@ var ForceType = {
 
 var GRAVITY = new THREE.Vector3(0, -9.8, 0);
 
+var loadMeshCallback = function ( object ) {
+  scene.add( object );
+}
 
-var test = function() {
-// instantiate a loader
-// var loader = new THREE.OBJLoader();
+var loadMeshCallback2 = function ( object ) {
+  var lg = 1000;  // num particles
+    scene.add( object );
+    object.traverse( function ( child ) {
+    if ( child instanceof THREE.Mesh ) {
+        console.log (" === CHILD === ");
+        console.log (child.geometry);
+        // TODO: Errors with buffer geometry
+        // randomPointPositions = new THREE.GeometryUtils.randomPointsInBufferGeometry( child.geometry, lg);
+        // console.log (randomPointPositions[0].x, randomPointPositions[0].y, randomPointPositions[0].z );
+        // for( var i = 0; i < randomPointPositions.length; i++ ){
+        //    var p = allParticle[i];
+        //    p.diffX = randomPointPositions[i].x * scale -p.x ;
+        //    p.diffY = randomPointPositions[i].y * scale -p.y;
+        //    p.diffZ = randomPointPositions[i].z * scale -p.z;
+        // }
+      }
+    })
+        // console.log("randomPointPositions");
+        // console.log(randomPointPositions);
+}
 
-// load a resource
-loader.load(
-	// resource URL
-	'objs/bigmax.obj',
-	// called when resource is loaded
-	function ( object ) {
+var inProgressCallback = function ( xhr ) {
+  console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+}
 
-		scene.add( object );
-
-	},
-	// called when loading is in progresses
-	function ( xhr ) {
-
-		console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
-
-	},
-	// called when loading has errors
-	function ( error ) {
-
-		console.log( 'An error happened' );
-
-	}
-);
+var errorCallback = function ( error ) {
+  console.log( 'An error happened' );
 }
 
 /**
  * User interface connection to the simulation.
  * @constructor
  */
-function Controller(startParticles, endParticles) {
+function Controller(renderer, scene, camera, startParticles, endParticles) {
+    this.renderer = renderer;
+    this.scene = scene;
+    this.camera = camera;
     this.startParticles = startParticles;
     this.endParticles = endParticles;
     this.mousedown = false;
-    // test()
     var _this = this;
-
     this.controls = {
         startText: $('.controls .start').on('keyup', function() {
             var newText = $(this).val();
@@ -105,6 +110,14 @@ function Controller(startParticles, endParticles) {
                 _this.handleForce(ForceType.RANDOM);
             }
             _this.startParticles.isTransporting = true;
+        }),
+        loadMesh: $('.controls .loadMesh').on('click', function() {
+          console.log("Loading mesh");
+          var obj_filename = $('.controls .3d_mesh option:selected').text();
+          var loader = new THREE.OBJLoader();
+          loader.load('./objs/' + obj_filename + '.obj', loadMeshCallback2, inProgressCallback, errorCallback);
+          console.log(loader);
+          _this.renderer.render(scene, camera);
         })
     };
 }
