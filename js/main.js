@@ -36,7 +36,6 @@ HEIGHT = window.innerHeight;
 
 $(document).ready(function() {
     scene = new THREE.Scene();
-    
     // camera = new THREE.OrthographicCamera(WIDTH/-2, WIDTH/2, HEIGHT/2, HEIGHT/-2, 1, 1000);
     camera = new THREE.PerspectiveCamera(140, WIDTH/HEIGHT, 1, 1000);
     camera.position.set( 0.0, 0, 300);
@@ -47,6 +46,6 @@ $(document).ready(function() {
     startParticles = new Particles(renderer, scene, camera, 1000);
     startParticles.isStart = true;
     endParticles = new Particles(renderer, scene, camera, 1000);
-    controller = new Controller(startParticles, endParticles);
+    controller = new Controller(renderer, scene, camera, startParticles, endParticles);
     render()
 });
