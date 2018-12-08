@@ -19,7 +19,8 @@ var startParticles = null,
     scene = null,
     renderer = null,
     camera = null,
-    ambientLight = null;
+    ambientLight = null,
+    controls = null;
 
 function updateCount() {
     var count = particles.statesize[0] * particles.statesize[1];
@@ -46,6 +47,8 @@ $(document).ready(function() {
     renderer = new THREE.WebGLRenderer();
     renderer.setClearColor(new THREE.Color(0, 0, 0));
   	renderer.setSize(WIDTH, HEIGHT);
+    controls = new THREE.OrbitControls(camera, renderer.domElement); 
+    controls.update();
     document.body.appendChild(renderer.domElement);
     startParticles = new Particles(renderer, scene, camera, 1000*2);
     startParticles.isStart = true;
