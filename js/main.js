@@ -18,7 +18,8 @@ var startParticles = null,
     controller = null,
     scene = null,
     renderer = null,
-    camera = null;
+    camera = null,
+    ambientLight = null;
 
 function updateCount() {
     var count = particles.statesize[0] * particles.statesize[1];
@@ -39,7 +40,9 @@ $(document).ready(function() {
     // camera = new THREE.OrthographicCamera(WIDTH/-2, WIDTH/2, HEIGHT/2, HEIGHT/-2, 1, 1000);
     // camera.position.set( 0.0, 0, 30);
     camera = new THREE.PerspectiveCamera(140, WIDTH/HEIGHT, 1, 1000);
-    camera.position.set( 0.0, 0, 150);
+    camera.position.set( 0, 0, 50);
+    ambientLight = new THREE.AmbientLight(0xffffff);
+    scene.add(ambientLight);
     renderer = new THREE.WebGLRenderer();
     renderer.setClearColor(new THREE.Color(0, 0, 0));
   	renderer.setSize(WIDTH, HEIGHT);

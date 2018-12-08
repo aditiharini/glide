@@ -20,28 +20,6 @@ var loadMeshCallback = function ( object ) {
   scene.add( object );
 }
 
-var loadMeshCallback2 = function ( object ) {
-  var lg = 1000;  // num particles
-    scene.add( object );
-    object.traverse( function ( child ) {
-    if ( child instanceof THREE.Mesh ) {
-        console.log (" === CHILD === ");
-        console.log (child.geometry);
-        // TODO: Errors with buffer geometry
-        // randomPointPositions = new THREE.GeometryUtils.randomPointsInBufferGeometry( child.geometry, lg);
-        // console.log (randomPointPositions[0].x, randomPointPositions[0].y, randomPointPositions[0].z );
-        // for( var i = 0; i < randomPointPositions.length; i++ ){
-        //    var p = allParticle[i];
-        //    p.diffX = randomPointPositions[i].x * scale -p.x ;
-        //    p.diffY = randomPointPositions[i].y * scale -p.y;
-        //    p.diffZ = randomPointPositions[i].z * scale -p.z;
-        // }
-      }
-    })
-        // console.log("randomPointPositions");
-        // console.log(randomPointPositions);
-}
-
 var inProgressCallback = function ( xhr ) {
   console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
 }
@@ -115,7 +93,7 @@ function Controller(renderer, scene, camera, startParticles, endParticles) {
           console.log("Loading mesh");
           var obj_filename = $('.controls .3d_mesh option:selected').text();
           var loader = new THREE.OBJLoader();
-          loader.load('./objs/' + obj_filename + '.obj', loadMeshCallback2, inProgressCallback, errorCallback);
+          loader.load('./objs/' + obj_filename + '.obj', loadMeshCallback, inProgressCallback, errorCallback);
           console.log(loader);
           _this.renderer.render(scene, camera);
         })
