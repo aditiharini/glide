@@ -1,17 +1,17 @@
 # glide
 TODO:
 Graphics Experiments
-- distance based on color (map similar colors close to each other)-Rose
-- add force fields- gravity, vortex, sound- Aditi
+- distance based on color (map similar colors close to each other)-Rose - done
+- add force fields- gravity, vortex, sound- Aditi- done w/out sound
 - formulate as a graph problem --> load object files for complex 3D shape testing- Rose
 - include some sort of random indexing for color matching--Rose
-- enable uploading OBJ files
+- enable uploading OBJ files - done
 - use ExtrudeGeometry to extrude shapes and do 3D mapping- Aditi
 - experiment with heuristics for creating a more 1-to-1 mapping
 
 UI Features
-- drag camera
-- zoom in/out
+- drag camera- done
+- zoom in/out- done
 - make buttons/inputs look nicer
 - sound effects
 
