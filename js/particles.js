@@ -202,7 +202,7 @@ Particles.prototype.transport = function(particleNum, scaleFactor) {
     var newVelocity = new THREE.Vector3(
         scaleFactor * weight * (dest.x - start.x),
         scaleFactor * weight * (dest.y - start.y),
-        0
+        scaleFactor * weight * (dest.z - start.z)
     );
     this.getVertex(particleNum).accl = newVelocity;
 }
@@ -220,7 +220,6 @@ Particles.prototype.resetAccel = function() {
         this.setVertexAccl(i, new THREE.Vector3(0, 0, 0));
     }
 }
-
 
 Particles.prototype.transportByMax = function () {
     for (var i = 0; i < this.numParticles; i++) {
