@@ -17,3 +17,20 @@ function sampleObj3d(obj, numPoints) {
     }
     return points
 }
+
+function getVerticesObj3d(obj) {
+    var numChildren = obj.children.length;
+    var vertices = [];
+    if (numChildren == 0) {
+        var allCoords = obj.geometry.getAttribute('position').array;
+        for (var i = 0; i < allCoords.length; i+=3) {
+            vertices.push(new THREE.Vector3(allCoords[i], allCoords[i+1], allCoords[i+2]));
+        }
+        return vertices;
+    }
+    for (var i = 0; i < numChildren; i++) {
+        vertices.push(...getVerticesObj3d(obj.children[i]));
+    }
+    return vertices;
+}
+

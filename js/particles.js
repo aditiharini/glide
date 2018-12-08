@@ -207,6 +207,10 @@ Particles.prototype.transport = function(particleNum, scaleFactor) {
     this.getVertex(particleNum).accl = newVelocity;
 }
 
+Particles.prototype.transportGeodesic = function(particleNum) {
+    
+}
+
 Particles.prototype.eulerStep = function() {
     for (var i = 0; i < this.numParticles; i++) {
         this.applyForcesToVertex(i);

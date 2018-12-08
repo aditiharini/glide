@@ -89,7 +89,9 @@ function Controller(scene, startParticles, endParticles) {
           var loader = new THREE.OBJLoader();
           loader.load('./objs/' + obj_filename + '.obj', 
           function(object) {
+              console.log(object);
               scene.add(object);
+              console.log(getVerticesObj3d(object));
               _this.initObjParticles(object);
           }, 
           inProgressCallback, 
