@@ -53,6 +53,6 @@ $(document).ready(function() {
     startParticles = new Particles(renderer, scene, camera, 1000*2);
     startParticles.isStart = true;
     endParticles = new Particles(renderer, scene, camera, 1000*2);
-    controller = new Controller(renderer, scene, camera, startParticles, endParticles);
+    controller = new Controller(scene, startParticles, endParticles);
     render()
 });

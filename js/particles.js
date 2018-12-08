@@ -132,7 +132,7 @@ Particles.prototype.moveParticle = function(i) {
     particle.add(particle.velocity);
 }
 
-Particles.prototype.createParticles = function(letters, numParticles) {
+Particles.prototype.createParticles = function(points) {
     var geom = new THREE.Geometry(),
         mat = new THREE.PointsMaterial({
             size: this.size,
@@ -143,9 +143,8 @@ Particles.prototype.createParticles = function(letters, numParticles) {
     var particles = new THREE.Points(geom, mat);
     this.particles = particles;
     this.scene.add(particles);
-    var points = letters.samplePoints(numParticles);
-    for (var i = 0; i < numParticles; i++) {
-        var point = new THREE.Vector3(points[i].x, points[i].y, 0)
+    for (var i = 0; i < this.numParticles; i++) {
+        var point = new THREE.Vector3(points[i].x, points[i].y, points[i].z);
         point.velocity = new THREE.Vector3(0, 0, 0);
         point.accl = new THREE.Vector3(0, 0, 0);
         this.pushVertex(point);
@@ -286,13 +285,24 @@ Particles.prototype.setOpacity = function(opacity) {
   this.opacity = opacity;
 }
 
+
 Particles.prototype.setSize = function(size) {
   this.size = size;
 }
 
-Particles.prototype.setText = function(newLetters, color) {
+Particles.prototype.setText = function(newLetters) {
     this.letters = newLetters;
-    this.moveParticles(newLetters, color);
+    var points = newLetters.samplePoints(this.numParticles);
+    this.moveParticles(points, newLetter);
+    this.drawParticles();
+    return this;
+}
+
+Particles.prototype.initObj = function(obj) {
+    this.obj = obj;
+    var points = sampleObj3d(obj, this.numParticles);
+    this.numParticles = points.length;
+    this.createParticles(points)
     this.drawParticles();
     return this;
 }

@@ -16,10 +16,6 @@ var ForceType = {
 
 var GRAVITY = new THREE.Vector3(0, -9.8, 0);
 
-var loadMeshCallback = function ( object ) {
-  scene.add( object );
-}
-
 var inProgressCallback = function ( xhr ) {
   console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
 }
@@ -32,10 +28,8 @@ var errorCallback = function ( error ) {
  * User interface connection to the simulation.
  * @constructor
  */
-function Controller(renderer, scene, camera, startParticles, endParticles) {
-    this.renderer = renderer;
+function Controller(scene, startParticles, endParticles) {
     this.scene = scene;
-    this.camera = camera;
     this.startParticles = startParticles;
     this.endParticles = endParticles;
     this.mousedown = false;
@@ -93,9 +87,14 @@ function Controller(renderer, scene, camera, startParticles, endParticles) {
           console.log("Loading mesh");
           var obj_filename = $('.controls .3d_mesh option:selected').text();
           var loader = new THREE.OBJLoader();
-          loader.load('./objs/' + obj_filename + '.obj', loadMeshCallback, inProgressCallback, errorCallback);
+          loader.load('./objs/' + obj_filename + '.obj', 
+          function(object) {
+              scene.add(object);
+              _this.initObjParticles(object);
+          }, 
+          inProgressCallback, 
+          errorCallback);
           console.log(loader);
-          _this.renderer.render(scene, camera);
         })
     };
 }
@@ -134,4 +133,13 @@ Controller.prototype.changeText = function(particles, newText) {
             particles.setOpacity(1.0);
         }
     );
+}
+
+Controller.prototype.initObjParticles = function (obj) {
+    this.startParticles.setColor(new THREE.Color(Colors.RED));
+    this.startParticles.setSize(0.3)
+    this.startParticles.initObj(obj);
+    this.endParticles.setColor(new THREE.Color(Colors.BLUE));
+    this.endParticles.setSize(0.3)
+    this.endParticles.initObj(obj);
 }
