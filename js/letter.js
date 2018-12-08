@@ -2,7 +2,7 @@ function Letters(text, font){
     console.log(text);
     this.shape = new THREE.TextGeometry(text, {
         font: font,
-        size: 250
+        size: 100
     });
 };
 
