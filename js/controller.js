@@ -130,6 +130,11 @@ Controller.prototype.handleForce = function(type) {
 }
 
 Controller.prototype.changeText = function(particles, newText) {
+    var cost = $('.controls .cost option:selected').text();
+    if (cost == "color") {
+        this.startParticles.setUseRandomColors();
+        this.endParticles.setUseRandomColors();
+    }
     var loader = new THREE.FontLoader();
     loader.load(
         '../fonts/helvetiker_bold.typeface.json',
