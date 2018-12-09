@@ -296,7 +296,7 @@ Particles.prototype.setSize = function(size) {
 Particles.prototype.setText = function(newLetters) {
     this.letters = newLetters;
     var points = newLetters.samplePoints(this.numParticles);
-    this.moveParticles(points, newLetter);
+    this.moveParticles(points);
     this.drawParticles();
     return this;
 }

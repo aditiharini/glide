@@ -82,6 +82,7 @@ function Controller(scene, startParticles, endParticles) {
                 _this.handleForce(ForceType.RANDOM);
             }
             _this.startParticles.isTransporting = true;
+            return false;
         }),
         loadMesh: $('.controls .loadMesh').on('click', function() {
           console.log("Loading mesh");
@@ -103,6 +104,7 @@ function Controller(scene, startParticles, endParticles) {
           inProgressCallback,
           errorCallback);
           console.log(loader);
+          return false;
         })
     };
 }
@@ -144,12 +146,13 @@ Controller.prototype.changeText = function(particles, newText) {
 }
 
 Controller.prototype.initObjParticles = function (particles, obj) {
+    console.log("init obj particles");
     if (particles == this.startParticles) {
-        translateGeometryObj3d(obj, -100, 0, 0);
+        translateGeometryObj3d(obj, -50, 0, 0);
         particles.setColor(new THREE.Color(Colors.RED));
     }
     else {
-        translateGeometryObj3d(obj, 100, 0, 0);
+        translateGeometryObj3d(obj, 50, 0, 0);
         particles.setColor(new THREE.Color(Colors.BLUE));
     }
     particles.setSize(0.3)
