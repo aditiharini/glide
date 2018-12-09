@@ -78,7 +78,7 @@ function Controller(scene, startParticles, endParticles) {
             if (force == "gravity") {
                 _this.handleForce(ForceType.GRAVITY);
             } 
-            else {
+            else if (force == "random") {
                 _this.handleForce(ForceType.RANDOM);
             }
             _this.startParticles.isTransporting = true;
