@@ -20,6 +20,11 @@ var Models = {
     BIGMAX: 1
 }
 
+var CameraTypes = {
+    ORTHOGRAPHIC: 1,
+    PERSPECTIVE: 2
+}
+
 var GRAVITY = new THREE.Vector3(0, -9.8, 0);
 
 var inProgressCallback = function ( xhr ) {
@@ -58,17 +63,6 @@ function Controller(scene, cameraControls, startParticles, endParticles) {
             _this.cameraControls.object = cam;
             _this.cameraControls.update();
         }),
-        moveText: $('.controls .move').on('click', function() {
-            var force = $('.controls .force option:selected').text();
-            // add obj file loading option
-            if (force == "gravity") {
-                _this.handleForce(ForceType.GRAVITY);
-            } 
-            else if (force == "random") {
-                _this.handleForce(ForceType.RANDOM);
-            }
-            return false;
-        }),
         loadMesh: $('.controls .loadMesh').on('click', function() {
           console.log("Loading mesh");
           var startObjName = $('.controls .3d_mesh_start option:selected').text();
@@ -98,6 +92,21 @@ function Controller(scene, cameraControls, startParticles, endParticles) {
           return false;
         })
     };
+}
+
+Controller.prototype.handleCameraChange = function(cameraType) {
+    var cam = null;
+    if (cameraType == CameraTypes.ORTHOGRAPHIC) {
+        cam = new THREE.OrthographicCamera(WIDTH/-2, WIDTH/2, HEIGHT/2, HEIGHT/-2, 1, 1000);
+        cam.position.set(0, 0, 10);
+    } else {
+        cam = new THREE.PerspectiveCamera(140, WIDTH/HEIGHT, 1, 1000);
+        cam.position.set( 0, 0, 50);
+    }
+    this.startParticles.camera = cam;
+    this.endParticles.camera = cam;
+    this.cameraControls.object = cam;
+    this.cameraControls.update();
 }
 
 Controller.prototype.handleForce = function(type) {

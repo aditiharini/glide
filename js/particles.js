@@ -20,7 +20,7 @@ function Particles(renderer, scene, camera, sprite, numParticles) {
     this.opacity = null;
     this.colorProbability = 0.5;
     this.forces = [];
-    this.timeStep = 0.3;
+    this.timeStep = 0.1;
     this.useRandomColors = false;
     this.sprite = sprite;
 }

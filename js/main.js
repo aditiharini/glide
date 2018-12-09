@@ -60,16 +60,19 @@ $(document).ready(function() {
     var text = {
         start: "",
         end: ""
-    };
+    };    
+    var cameraMode = {
+        orthographic: false,
+        perspective: false, 
+    }
     var gui = new dat.GUI();
     var textF = gui.addFolder('Text');
     var modelF = gui.addFolder('Model');
+    var cameraF = gui.addFolder('Camera');
     textF.add(text, 'start').onChange(function(){
-        console.log(text);
         controller.changeText(startParticles, text.start);
     });
     textF.add(text, 'end').onChange(function(){
-        console.log(text);
         controller.changeText(endParticles, text.end);
     });
     var modelFiles = {
@@ -78,10 +81,21 @@ $(document).ready(function() {
     };
     modelF.add(modelFiles, 'start', Models);
     modelF.add(modelFiles, 'end', Models);
-    gui.add(startParticles, 'costCalculation', Cost);
-    gui.add(startParticles, 'transportMode', TransportMode);
-    gui.add(startParticles, 'forceType', ForceType);
-    gui.add(controller, 'startTransport');
+    cameraF.add(cameraMode, 'orthographic').listen().onChange(function(){
+        cameraMode.perspective = false;
+        cameraMode.orthographic = true;
+        controller.handleCameraChange(CameraTypes.ORTHOGRAPHIC);
+    });
+    cameraF.add(cameraMode, 'perspective').listen().onChange(function() {
+        cameraMode.orthographic = false;
+        cameraMode.perspective = true;
+        controller.handleCameraChange(CameraTypes.PERSPECTIVE);
+    });
+    cameraMode.perspective = true;
+    gui.add(startParticles, 'costCalculation', Cost).name("cost metric");
+    gui.add(startParticles, 'transportMode', TransportMode).name("map heuristic");
+    gui.add(startParticles, 'forceType', ForceType).name("force");
+    gui.add(controller, 'startTransport').name("transport!");
     gui.open();
     render()
 });

@@ -9,7 +9,6 @@
     <script src="lib/OBJLoader.js"></script>
     <script src="lib/GeometryUtils.js"></script>
     <script src="lib/OrbitControls.js"></script>
-    <script src="js/geom_utils.js"></script>
     <script src="js/letter.js"></script>
     <script src="js/particles.js"></script>
     <script src="js/controller.js"></script>
@@ -22,14 +21,6 @@
   </head>
   <body>
     <div class="controls">
-      <div class="force">
-        <label>Forces:</label>
-        <select class ="force">
-          <option value="none">none</option>
-          <option value="gravity">gravity</option>
-          <option value="random">random</option>
-        </select>
-      </div>
       <div class="3d_mesh_start">
         <label>Start Mesh:</label>
         <select class ="3d_mesh_start">
@@ -41,16 +32,6 @@
         <select class ="3d_mesh_end">
           <option value="bigmax">bigmax</option>
         </select>
-      </div>
-      <div class="persp">
-        <label>Perspective:</label>
-        <input type="radio" value="persp" name="cam" class="persp" checked/>
-        <label for="persp">Perspective</label>
-        <input type="radio" value="ortho" name="cam" class="persp"/>
-        <label for="ortho">Orthographic</label>
-      </div>
-      <div class="move">
-        <button class="move">Move</button>
       </div>
       <div class="loadMesh">
         <button class="loadMesh">Load Meshes</button>
