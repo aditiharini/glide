@@ -158,12 +158,11 @@ Particles.prototype.createParticles = function(points) {
     this.applyVertexVelocities()
 }
 
-Particles.prototype.moveParticles = function(letters) {
+Particles.prototype.moveParticles = function(points) {
     if (!this.particles) {
-        this.createParticles(letters, this.numParticles);
+        this.createParticles(points, this.numParticles);
         return this;
     }
-    var points = letters.samplePoints(this.numParticles);
     for (var i = 0; i < this.numParticles; i++) {
         this.setVertexPosition(i, points[i]);
     }
@@ -273,7 +272,7 @@ Particles.prototype.drawParticles = function() {
         this.eulerStep();
         this.resetAccel();
     }
-    this.renderer.render(scene, camera);
+    this.renderer.render(this.scene, this.camera);
 }
 
 Particles.prototype.getCount = function() {

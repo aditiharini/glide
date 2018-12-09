@@ -29,11 +29,12 @@ var errorCallback = function ( error ) {
  * User interface connection to the simulation.
  * @constructor
  */
-function Controller(scene, startParticles, endParticles) {
+function Controller(scene, cameraControls, startParticles, endParticles) {
     this.scene = scene;
     this.startParticles = startParticles;
     this.endParticles = endParticles;
     this.mousedown = false;
+    this.cameraControls = cameraControls;
     var _this = this;
     this.controls = {
         startText: $('.controls .start').on('keyup', function() {
@@ -47,6 +48,22 @@ function Controller(scene, startParticles, endParticles) {
             if (newText != "") {
                 _this.changeText(_this.endParticles, newText)
             }
+        }),
+        camPersp: $('.controls .persp input[name=cam]:radio').on('change', function() {
+            var val = $('input[name=cam]:checked').val();
+            var cam = null;
+            if (val == "ortho") {
+                console.log("got to ortho");
+                cam = new THREE.OrthographicCamera(WIDTH/-2, WIDTH/2, HEIGHT/2, HEIGHT/-2, 1, 1000);
+                cam.position.set(0, 0, 30);
+            } else {
+                cam = new THREE.PerspectiveCamera(140, WIDTH/HEIGHT, 1, 1000);
+                cam.position.set( 0, 0, 50);
+            }
+            _this.startParticles.camera = cam;
+            _this.endParticles.camera = cam;
+            _this.cameraControls.object = cam;
+            _this.cameraControls.update();
         }),
         moveText: $('.controls .move').on('click', function() {
             var startPoints = _this.startParticles.getPoints();
