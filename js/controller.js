@@ -92,6 +92,7 @@ function Controller(scene, startParticles, endParticles) {
           loader.load('./objs/' + startObjName + '.obj', 
           function(object) {
               scene.add(object);
+              var vs = getVerticesObj3d(object);
               _this.initObjParticles(_this.startParticles, object);
           }, 
           inProgressCallback, 
@@ -146,7 +147,6 @@ Controller.prototype.changeText = function(particles, newText) {
 }
 
 Controller.prototype.initObjParticles = function (particles, obj) {
-    console.log("init obj particles");
     if (particles == this.startParticles) {
         translateGeometryObj3d(obj, -50, 0, 0);
         particles.setColor(new THREE.Color(Colors.RED));
