@@ -5,6 +5,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <script src="lib/jquery-2.1.1.min.js"></script>
     <script src="lib/three.min.js"></script>
+    <script src="lib/dat.gui.min.js"></script>
     <script src="lib/OBJLoader.js"></script>
     <script src="lib/GeometryUtils.js"></script>
     <script src="lib/OrbitControls.js"></script>
@@ -21,35 +22,12 @@
   </head>
   <body>
     <div class="controls">
-      <div class="start">
-        <label>Start:</label>
-        <input class="start"/>
-      </div>
-      <div class="end">
-        <label>End:</label>
-        <input class="end"/>
-      </div>
-      <div class="mode">
-        <label>Transport Mode:</label>
-        <select class ="mode">
-          <option value="max">max</option>
-          <option value="weighted">weighted</option>
-        </select>
-      </div>
       <div class="force">
         <label>Forces:</label>
         <select class ="force">
           <option value="none">none</option>
           <option value="gravity">gravity</option>
           <option value="random">random</option>
-        </select>
-      </div>
-      <div class="cost">
-        <label>Distance Metric:</label>
-        <select class ="cost">
-          <option value="distance">distance</option>
-          <option value="color">color</option>
-          <option value="geodesic_distance">geodesic distance</option>
         </select>
       </div>
       <div class="3d_mesh_start">
