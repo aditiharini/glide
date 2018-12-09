@@ -11,8 +11,13 @@ var Cost = {
 }
 
 var ForceType = {
-    GRAVITY: 1,
-    RANDOM: 2
+    NONE: 1,
+    GRAVITY: 2,
+    RANDOM: 3
+}
+
+var Models = {
+    BIGMAX: 1
 }
 
 var GRAVITY = new THREE.Vector3(0, -9.8, 0);
@@ -37,18 +42,6 @@ function Controller(scene, cameraControls, startParticles, endParticles) {
     this.cameraControls = cameraControls;
     var _this = this;
     this.controls = {
-        startText: $('.controls .start').on('keyup', function() {
-            var newText = $(this).val();
-            if (newText != ""){
-                _this.changeText(_this.startParticles, newText);
-            }
-        }),
-        endText: $('.controls .end').on('keyup', function() {
-            var newText = $(this).val();
-            if (newText != "") {
-                _this.changeText(_this.endParticles, newText)
-            }
-        }),
         camPersp: $('.controls .persp input[name=cam]:radio').on('change', function() {
             var val = $('input[name=cam]:checked').val();
             var cam = null;
@@ -66,42 +59,14 @@ function Controller(scene, cameraControls, startParticles, endParticles) {
             _this.cameraControls.update();
         }),
         moveText: $('.controls .move').on('click', function() {
-            var startPoints = _this.startParticles.getPoints();
-            var endPoints = _this.endParticles.getPoints();
-            var mode = $('.controls .mode option:selected').text();
-            var cost = $('.controls .cost option:selected').text();
             var force = $('.controls .force option:selected').text();
             // add obj file loading option
-            if (cost == "distance") {
-              _this.startParticles.costCalculation = Cost.DISTANCE;
-            } else if (cost == "geodesic distance"){
-              _this.startParticles.costCalculation = Cost.GEODESIC_DISTANCE;
-            } else {
-              _this.startParticles.costCalculation = Cost.COLOR;
-              _this.startParticles.setUseRandomColors();
-              _this.endParticles.setUseRandomColors();
-            }
-            if (mode == "max") {
-                _this.startParticles.transportMode = TransportMode.MAX;
-                _this.startParticles.setMappingByMax(
-                  getWeights(_this.startParticles,
-                             _this.endParticles,
-                             _this.startParticles.costCalculation), endPoints);
-            }
-            else {
-                _this.startParticles.transportMode = TransportMode.WEIGHTED;
-                _this.startParticles.setMappingByWeight(
-                  getWeights(_this.startParticles,
-                             _this.endParticles,
-                             _this.startParticles.costCalculation), endPoints);
-            }
             if (force == "gravity") {
                 _this.handleForce(ForceType.GRAVITY);
             } 
             else if (force == "random") {
                 _this.handleForce(ForceType.RANDOM);
             }
-            _this.startParticles.isTransporting = true;
             return false;
         }),
         loadMesh: $('.controls .loadMesh').on('click', function() {
@@ -136,9 +101,9 @@ function Controller(scene, cameraControls, startParticles, endParticles) {
 }
 
 Controller.prototype.handleForce = function(type) {
-    if (type == ForceType.GRAVITY) {
+    if (this.startParticles.forceType == ForceType.GRAVITY) {
         this.startParticles.addForce(new Force(GRAVITY, null, null, null));
-    } else {
+    } else if (this.startParticles.forceType == ForceType.RANDOM){
         var force1 = new Force(new THREE.Vector3(Math.random()*5000, Math.random()*5000, 0), 
                               new THREE.Vector3(10, 0, 0), 
                               60, 
@@ -176,6 +141,28 @@ Controller.prototype.changeText = function(particles, newText) {
     );
 }
 
+Controller.prototype.startTransport = function () {
+    console.log("got to start transport");
+    var startPoints = this.startParticles.getPoints();
+    var endPoints = this.endParticles.getPoints();
+    this.handleForce();
+    if (this.startParticles.costCalculation == Cost.COLOR) {
+        this.startParticles.setUseRandomColors();
+    }
+    if (this.startParticles.transportMode == TransportMode.MAX) {
+        this.startParticles.setMappingByMax(
+            getWeights(this.startParticles,
+                       this.endParticles,
+                       this.startParticles.costCalculation), endPoints);
+    } else if (this.startParticles.transportMode == TransportMode.WEIGHTED) {
+        this.startParticles.setMappingByWeight(
+            getWeights(this.startParticles,
+                        this.endParticles,
+                        this.startParticles.costCalculation), endPoints);
+    } 
+    this.startParticles.isTransporting = true;
+}
+
 Controller.prototype.initObjParticles = function (particles, obj) {
     if (this.startParticles.costCalculation == Cost.GEODESIC_DISTANCE) {
         this.setupGeodesic(particles, obj);
@@ -191,6 +178,10 @@ Controller.prototype.initObjParticles = function (particles, obj) {
     }
     particles.setSize(1)
     particles.initObj(obj);
+}
+
+Controller.prototype.loadMeshes = function (file) {
+
 }
 
 Controller.prototype.setupGeodesic = function (particles, obj) {

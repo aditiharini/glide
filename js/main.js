@@ -57,5 +57,31 @@ $(document).ready(function() {
     startParticles.isStart = true;
     endParticles = new Particles(renderer, scene, camera, particleSprite, 1000*2);
     controller = new Controller(scene, controls, startParticles, endParticles);
+    var text = {
+        start: "",
+        end: ""
+    };
+    var gui = new dat.GUI();
+    var textF = gui.addFolder('Text');
+    var modelF = gui.addFolder('Model');
+    textF.add(text, 'start').onChange(function(){
+        console.log(text);
+        controller.changeText(startParticles, text.start);
+    });
+    textF.add(text, 'end').onChange(function(){
+        console.log(text);
+        controller.changeText(endParticles, text.end);
+    });
+    var modelFiles = {
+        start: null,
+        end: null
+    };
+    modelF.add(modelFiles, 'start', Models);
+    modelF.add(modelFiles, 'end', Models);
+    gui.add(startParticles, 'costCalculation', Cost);
+    gui.add(startParticles, 'transportMode', TransportMode);
+    gui.add(startParticles, 'forceType', ForceType);
+    gui.add(controller, 'startTransport');
+    gui.open();
     render()
 });

@@ -12,6 +12,7 @@ function Particles(renderer, scene, camera, sprite, numParticles) {
     this.camera = camera;
     this.isTransporting = false;
     this.transportMode = null;
+    this.forceType = null;
     this.costCalculation = null;
     this.color = null;
     this.size = null;
@@ -37,6 +38,9 @@ Particles.prototype.getHeight = function() {
 }
 
 Particles.prototype.getPoints = function() {
+    if (!this.particles){
+        return [];
+    }
     return this.particles.geometry.vertices;
 }
 
