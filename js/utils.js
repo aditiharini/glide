@@ -34,3 +34,18 @@ function getVerticesObj3d(obj) {
     return vertices;
 }
 
+function translateGeometryObj3d(obj, deltaX, deltaY, deltaZ) {
+    var numChildren = obj.children.length;
+    if (numChildren == 0) {
+        obj.geometry.translate(deltaX, deltaY, deltaZ);
+        return;
+    }
+    for (var i = 0; i < numChildren; i++) {
+        translateGeometryObj3d(obj.children[i], deltaX, deltaY, deltaZ);
+    }
+}
+
+function generateGraphObj3d(vertices) {
+
+}
+

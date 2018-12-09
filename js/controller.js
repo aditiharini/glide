@@ -85,16 +85,22 @@ function Controller(scene, startParticles, endParticles) {
         }),
         loadMesh: $('.controls .loadMesh').on('click', function() {
           console.log("Loading mesh");
-          var obj_filename = $('.controls .3d_mesh option:selected').text();
+          var startObjName = $('.controls .3d_mesh_start option:selected').text();
+          var endObjName = $('.controls .3d_mesh_end option:selected').text();
           var loader = new THREE.OBJLoader();
-          loader.load('./objs/' + obj_filename + '.obj', 
+          loader.load('./objs/' + startObjName + '.obj', 
           function(object) {
-              console.log(object);
               scene.add(object);
-              console.log(getVerticesObj3d(object));
-              _this.initObjParticles(object);
+              _this.initObjParticles(_this.startParticles, object);
           }, 
           inProgressCallback, 
+          errorCallback);
+          loader.load('./objs/' + endObjName + '.obj',
+          function(object){
+              scene.add(object);
+              _this.initObjParticles(_this.endParticles, object);
+          },
+          inProgressCallback,
           errorCallback);
           console.log(loader);
         })
@@ -137,11 +143,15 @@ Controller.prototype.changeText = function(particles, newText) {
     );
 }
 
-Controller.prototype.initObjParticles = function (obj) {
-    this.startParticles.setColor(new THREE.Color(Colors.RED));
-    this.startParticles.setSize(0.3)
-    this.startParticles.initObj(obj);
-    this.endParticles.setColor(new THREE.Color(Colors.BLUE));
-    this.endParticles.setSize(0.3)
-    this.endParticles.initObj(obj);
+Controller.prototype.initObjParticles = function (particles, obj) {
+    if (particles == this.startParticles) {
+        translateGeometryObj3d(obj, -100, 0, 0);
+        particles.setColor(new THREE.Color(Colors.RED));
+    }
+    else {
+        translateGeometryObj3d(obj, 100, 0, 0);
+        particles.setColor(new THREE.Color(Colors.BLUE));
+    }
+    particles.setSize(0.3)
+    particles.initObj(obj);
 }
