@@ -109,6 +109,7 @@ function Controller(scene, cameraControls, startParticles, endParticles) {
           var startObjName = $('.controls .3d_mesh_start option:selected').text();
           var endObjName = $('.controls .3d_mesh_end option:selected').text();
           if ($('.controls .cost option:selected').text() == "geodesic distance") {
+            _this.cameraControls.autoRotate = true;
             _this.startParticles.costCalculation = Cost.GEODESIC_DISTANCE;
           }
           var loader = new THREE.OBJLoader();

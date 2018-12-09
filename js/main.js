@@ -30,6 +30,7 @@ function updateCount() {
 function render() {
     startParticles.drawParticles();
     endParticles.drawParticles();
+    controls.update();
     requestAnimFrame(render);
 }
 // set the scene size
