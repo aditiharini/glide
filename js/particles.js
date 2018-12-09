@@ -309,3 +309,10 @@ Particles.prototype.initObj = function(obj) {
     this.drawParticles();
     return this;
 }
+
+Particles.prototype.initPoints = function (points) {
+    this.numParticles = points.length;
+    this.createParticles(points);
+    this.drawParticles();
+    return this;
+}

@@ -6,7 +6,8 @@ var TransportMode = {
 
 var Cost = {
   DISTANCE: 1,
-  COLOR: 2
+  COLOR: 2,
+  GEODESIC_DISTANCE: 3
 }
 
 var ForceType = {
@@ -56,6 +57,8 @@ function Controller(scene, startParticles, endParticles) {
             // add obj file loading option
             if (cost == "distance") {
               _this.startParticles.costCalculation = Cost.DISTANCE;
+            } else if (cost == "geodesic distance"){
+              _this.startParticles.costCalculation = Cost.GEODESIC_DISTANCE;
             } else {
               _this.startParticles.costCalculation = Cost.COLOR;
               _this.startParticles.setUseRandomColors();
@@ -88,23 +91,26 @@ function Controller(scene, startParticles, endParticles) {
           console.log("Loading mesh");
           var startObjName = $('.controls .3d_mesh_start option:selected').text();
           var endObjName = $('.controls .3d_mesh_end option:selected').text();
+          if ($('.controls .cost option:selected').text() == "geodesic distance") {
+            _this.startParticles.costCalculation = Cost.GEODESIC_DISTANCE;
+          }
           var loader = new THREE.OBJLoader();
           loader.load('./objs/' + startObjName + '.obj', 
           function(object) {
               scene.add(object);
-            //   var vs = getVerticesObj3d(object)
-            //   console.log(dijkstra(vs, vs[2], vs[600]));
               _this.initObjParticles(_this.startParticles, object);
           }, 
           inProgressCallback, 
           errorCallback);
-          loader.load('./objs/' + endObjName + '.obj',
-          function(object){
-              scene.add(object);
-              _this.initObjParticles(_this.endParticles, object);
-          },
-          inProgressCallback,
-          errorCallback);
+          if (!(_this.startParticles.costCalculation == Cost.GEODESIC_DISTANCE)){
+            loader.load('./objs/' + endObjName + '.obj',
+            function(object){
+                scene.add(object);
+                _this.initObjParticles(_this.endParticles, object);
+            },
+            inProgressCallback,
+            errorCallback);
+          }
           console.log(loader);
           return false;
         })
@@ -148,7 +154,11 @@ Controller.prototype.changeText = function(particles, newText) {
 }
 
 Controller.prototype.initObjParticles = function (particles, obj) {
-    if (particles == this.startParticles) {
+    if (this.startParticles.costCalculation == Cost.GEODESIC_DISTANCE) {
+        this.setupGeodesic(particles, obj);
+        this.displayGeodesicPath(particles, obj);
+        return;
+    } else if (particles == this.startParticles) {
         translateGeometryObj3d(obj, -50, 0, 0);
         particles.setColor(new THREE.Color(Colors.RED));
     }
@@ -159,3 +169,26 @@ Controller.prototype.initObjParticles = function (particles, obj) {
     particles.setSize(0.3)
     particles.initObj(obj);
 }
+
+Controller.prototype.setupGeodesic = function (particles, obj) {
+    particles.setColor(new THREE.Color(Colors.RED));
+    particles.setSize(0.5);
+}
+
+Controller.prototype.displayGeodesicPath = function(particles, obj) {
+    var vs = getVerticesObj3d(obj);
+    var start = vs[Math.round(Math.random() * vs.length)]
+    var dest = vs[Math.round(Math.random() * vs.length)]
+    console.log(start);
+    console.log(dest);
+    // It's not working with the randomized points for some reason and I don't know why 
+    // and don't have time to figure it out
+    var sp = dijkstra(vs, vs[0], vs[500]);
+    particles.initPoints([vs[0], vs[500]]);
+    console.log(sp);
+    var geometry = new THREE.BufferGeometry().setFromPoints( sp );
+    var material = new THREE.LineBasicMaterial( { color : 0xff0000 } );
+    var curveObject = new THREE.Line( geometry, material );
+    this.scene.add(curveObject);
+}
+
