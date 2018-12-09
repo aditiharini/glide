@@ -76,6 +76,45 @@ function generateGraphObj3d(vertices) {
 }
 
 function dijkstra(neighbors, start, end) {
+    var sp = {},
+    distances = {},
+    curNeighbors = null,
+    curNode = JSON.stringify(start);
+    distances[curNode] = 0;
+    sp[curNode] = true;
+    while (!(JSON.stringify(end) in sp)) {
+        curNeighbors = neighbors[JSON.stringify(curNode)];
+        for (var neighbor in curNeighbors) {
+            var newDistance = distances[curNode] + distance(JSON.parse(curNode), JSON.parse(neighbor));
+            if (!(neighbor in sp) && 
+                (!(neighbor in distances) || 
+                ( newDistance < distances[neighbor]))) {
+                    distances[neighbor] = newDistance;
+            }
+        }
+        curNode = getMin(distances);
+        sp[curNode] = true;
+    }
+    return sp;
+}
 
+function getMin(neighbors, distances, visited) {
+    var minKey = null,
+        minValue = null;
+    for (var key in distances) {
+        if (!minValue || distances[key] < minValue) {
+            minKey = key;
+            minValue = distances[key];
+        }
+    }
+    return minKey;
+}
+
+function deserializeShortestPath(sp) {
+    arrSp = []
+    for (var key in sp) {
+        arrSp.push(JSON.parse(key));
+    }
+    return arrSp
 }
 
