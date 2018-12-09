@@ -20,7 +20,8 @@ var startParticles = null,
     renderer = null,
     camera = null,
     ambientLight = null,
-    controls = null;
+    controls = null,
+    particleSprite = null;
 
 function updateCount() {
     var count = particles.statesize[0] * particles.statesize[1];
@@ -51,9 +52,10 @@ $(document).ready(function() {
     controls = new THREE.OrbitControls(camera, renderer.domElement); 
     controls.update();
     document.body.appendChild(renderer.domElement);
-    startParticles = new Particles(renderer, scene, camera, 1000*2);
+    particleSprite = new THREE.TextureLoader().load( './sprites/disc.png');
+    startParticles = new Particles(renderer, scene, camera, particleSprite, 1000*2);
     startParticles.isStart = true;
-    endParticles = new Particles(renderer, scene, camera, 1000*2);
+    endParticles = new Particles(renderer, scene, camera, particleSprite, 1000*2);
     controller = new Controller(scene, controls, startParticles, endParticles);
     render()
 });

@@ -5,7 +5,7 @@ var Colors = {
   GREEN:0x00ff00
 }
 
-function Particles(renderer, scene, camera, numParticles) {
+function Particles(renderer, scene, camera, sprite, numParticles) {
     this.renderer = renderer;
     this.scene = scene;
     this.numParticles = numParticles;
@@ -21,6 +21,7 @@ function Particles(renderer, scene, camera, numParticles) {
     this.forces = [];
     this.timeStep = 0.3;
     this.useRandomColors = false;
+    this.sprite = sprite;
 }
 
 Particles.prototype.getColorProbability = function() {
@@ -136,9 +137,13 @@ Particles.prototype.createParticles = function(points) {
     var geom = new THREE.Geometry(),
         mat = new THREE.PointsMaterial({
             size: this.size,
-            vertexColors: THREE.VertexColors
+            vertexColors: THREE.VertexColors,
+            map: this.sprite,
+            transparent: true,
+            depthTest: false,
             // transparent: this.transparent,
             // opacity: this.opacity
+
         });
     var particles = new THREE.Points(geom, mat);
     this.particles = particles;

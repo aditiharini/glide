@@ -55,7 +55,7 @@ function Controller(scene, cameraControls, startParticles, endParticles) {
             if (val == "ortho") {
                 console.log("got to ortho");
                 cam = new THREE.OrthographicCamera(WIDTH/-2, WIDTH/2, HEIGHT/2, HEIGHT/-2, 1, 1000);
-                cam.position.set(0, 0, 30);
+                cam.position.set(0, 0, 10);
             } else {
                 cam = new THREE.PerspectiveCamera(140, WIDTH/HEIGHT, 1, 1000);
                 cam.position.set( 0, 0, 50);
@@ -169,7 +169,7 @@ Controller.prototype.changeText = function(particles, newText) {
                 letters.translate(-letters.getWidth()/2, -letters.getHeight());
                 particles.setColor(new THREE.Color(Colors.WHITE));
             }
-            particles.setSize(1);
+            particles.setSize(5);
             particles.setText(letters);
             particles.setOpacity(1.0);
         }
@@ -189,7 +189,7 @@ Controller.prototype.initObjParticles = function (particles, obj) {
         translateGeometryObj3d(obj, 50, 0, 0);
         particles.setColor(new THREE.Color(Colors.BLUE));
     }
-    particles.setSize(0.3)
+    particles.setSize(1)
     particles.initObj(obj);
 }
 
