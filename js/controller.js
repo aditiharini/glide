@@ -17,7 +17,7 @@ var ForceType = {
 }
 
 var Models = {
-    BIGMAX: 1
+    BIGMAX: "bigmax"
 }
 
 var CameraTypes = {
@@ -45,60 +45,35 @@ function Controller(scene, cameraControls, startParticles, endParticles) {
     this.endParticles = endParticles;
     this.mousedown = false;
     this.cameraControls = cameraControls;
+}
+
+Controller.prototype.handleModelLoad = function(startName, endName) {
+    console.log("Loading mesh");
+    var loader = new THREE.OBJLoader();
     var _this = this;
-    this.controls = {
-        camPersp: $('.controls .persp input[name=cam]:radio').on('change', function() {
-            var val = $('input[name=cam]:checked').val();
-            var cam = null;
-            if (val == "ortho") {
-                console.log("got to ortho");
-                cam = new THREE.OrthographicCamera(WIDTH/-2, WIDTH/2, HEIGHT/2, HEIGHT/-2, 1, 1000);
-                cam.position.set(0, 0, 10);
-            } else {
-                cam = new THREE.PerspectiveCamera(140, WIDTH/HEIGHT, 1, 1000);
-                cam.position.set( 0, 0, 50);
-            }
-            _this.startParticles.camera = cam;
-            _this.endParticles.camera = cam;
-            _this.cameraControls.object = cam;
-            _this.cameraControls.update();
-        }),
-        loadMesh: $('.controls .loadMesh').on('click', function() {
-          console.log("Loading mesh");
-          var startObjName = $('.controls .3d_mesh_start option:selected').text();
-          var endObjName = $('.controls .3d_mesh_end option:selected').text();
-          if ($('.controls .cost option:selected').text() == "geodesic distance") {
-            _this.cameraControls.autoRotate = true;
-            _this.startParticles.costCalculation = Cost.GEODESIC_DISTANCE;
-          }
-          var loader = new THREE.OBJLoader();
-          loader.load('./objs/' + startObjName + '.obj', 
-          function(object) {
-              scene.add(object);
-              _this.initObjParticles(_this.startParticles, object);
-          }, 
-          inProgressCallback, 
-          errorCallback);
-          if (!(_this.startParticles.costCalculation == Cost.GEODESIC_DISTANCE)){
-            loader.load('./objs/' + endObjName + '.obj',
-            function(object){
-                scene.add(object);
-                _this.initObjParticles(_this.endParticles, object);
-            },
-            inProgressCallback,
-            errorCallback);
-          }
-          console.log(loader);
-          return false;
-        })
-    };
+    loader.load('./objs/' + startName+ '.obj', 
+    function(object) {
+        this.scene.add(object);
+        _this.initObjParticles(this.startParticles, object);
+    }, 
+    inProgressCallback, 
+    errorCallback);
+    if (!(this.startParticles.costCalculation == Cost.GEODESIC_DISTANCE)){
+      loader.load('./objs/' + endName + '.obj',
+      function(object){
+          scene.add(object);
+          _this.initObjParticles(this.endParticles, object);
+      },
+      inProgressCallback,
+      errorCallback);
+    }
 }
 
 Controller.prototype.handleCameraChange = function(cameraType) {
     var cam = null;
     if (cameraType == CameraTypes.ORTHOGRAPHIC) {
         cam = new THREE.OrthographicCamera(WIDTH/-2, WIDTH/2, HEIGHT/2, HEIGHT/-2, 1, 1000);
-        cam.position.set(0, 0, 10);
+        cam.position.set(0, 0, 100);
     } else {
         cam = new THREE.PerspectiveCamera(140, WIDTH/HEIGHT, 1, 1000);
         cam.position.set( 0, 0, 50);
@@ -122,11 +97,6 @@ Controller.prototype.handleForce = function(type) {
 }
 
 Controller.prototype.changeText = function(particles, newText) {
-    var cost = $('.controls .cost option:selected').text();
-    if (cost == "color") {
-        this.startParticles.setUseRandomColors();
-        this.endParticles.setUseRandomColors();
-    }
     var loader = new THREE.FontLoader();
     loader.load(
         '../fonts/helvetiker_bold.typeface.json',
@@ -151,13 +121,9 @@ Controller.prototype.changeText = function(particles, newText) {
 }
 
 Controller.prototype.startTransport = function () {
-    console.log("got to start transport");
     var startPoints = this.startParticles.getPoints();
     var endPoints = this.endParticles.getPoints();
     this.handleForce();
-    if (this.startParticles.costCalculation == Cost.COLOR) {
-        this.startParticles.setUseRandomColors();
-    }
     if (this.startParticles.transportMode == TransportMode.MAX) {
         this.startParticles.setMappingByMax(
             getWeights(this.startParticles,
@@ -168,12 +134,16 @@ Controller.prototype.startTransport = function () {
             getWeights(this.startParticles,
                         this.endParticles,
                         this.startParticles.costCalculation), endPoints);
-    } 
+    }  else {
+        this.displayGeodesicPath(this.startParticles)
+    }
     this.startParticles.isTransporting = true;
 }
 
 Controller.prototype.initObjParticles = function (particles, obj) {
     if (this.startParticles.costCalculation == Cost.GEODESIC_DISTANCE) {
+        console.log("got to geodesic");
+        particles.obj = obj;
         this.setupGeodesic(particles, obj);
         this.displayGeodesicPath(particles, obj);
         return;
@@ -189,17 +159,14 @@ Controller.prototype.initObjParticles = function (particles, obj) {
     particles.initObj(obj);
 }
 
-Controller.prototype.loadMeshes = function (file) {
 
-}
-
-Controller.prototype.setupGeodesic = function (particles, obj) {
+Controller.prototype.setupGeodesic = function (particles) {
     particles.setColor(new THREE.Color(Colors.RED));
     particles.setSize(0.5);
 }
 
-Controller.prototype.displayGeodesicPath = function(particles, obj) {
-    var vs = getVerticesObj3d(obj);
+Controller.prototype.displayGeodesicPath = function(particles) {
+    var vs = getVerticesObj3d(particles.obj);
     var start = vs[Math.round(Math.random() * vs.length)]
     var dest = vs[Math.round(Math.random() * vs.length)]
     console.log(start);
@@ -213,5 +180,6 @@ Controller.prototype.displayGeodesicPath = function(particles, obj) {
     var material = new THREE.LineBasicMaterial( { color : 0xff0000 } );
     var curveObject = new THREE.Line( geometry, material );
     this.scene.add(curveObject);
+    this.cameraControls.autoRotate = true;
 }
 
