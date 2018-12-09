@@ -36,13 +36,8 @@ function dijkstra(vertices, start, end) {
     curNode = JSON.stringify(start);
     distances[curNode] = 0;
     sp[curNode] = true;
-    counter = 0;
-    console.log("start");
-    console.log(JSON.stringify(start));
-    console.log("end");
-    console.log(JSON.stringify(end));
     while (!(JSON.stringify(end) in sp)) {
-        curNeighbors = neighbors[JSON.stringify(curNode)];
+        curNeighbors = neighbors[curNode];
         for (var neighbor in curNeighbors) {
             var newDistance = distances[curNode] + distance(JSON.parse(curNode), JSON.parse(neighbor));
             if (!(neighbor in sp) && 
@@ -51,24 +46,19 @@ function dijkstra(vertices, start, end) {
                     distances[neighbor] = newDistance;
             }
         }
-        curNode = getMin(neighbors[curNode], distances, sp);
-        console.log(curNode);
+        curNode = getMin(distances, sp);
         sp[curNode] = true;
-        counter++;
-        if (counter == 50) {
-            break;
-        }
     }
     return deserializeShortestPath(sp);
 }
 
-function getMin(neighbors, distances, visited) {
+function getMin(distances, visited) {
     var minKey = null,
         minValue = null;
-    for (var neighbor in neighbors) {
-        if (!(neighbor in visited) && (!minValue || distances[neighbor] < minValue)) {
-            minKey = neighbor;
-            minValue = distances[neighbor];
+    for (var node in distances) {
+        if (!(node in visited) && (!minValue || distances[node] < minValue)) {
+            minKey = node;
+            minValue = distances[node];
         }
     }
     return minKey;

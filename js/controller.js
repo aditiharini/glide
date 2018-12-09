@@ -92,6 +92,8 @@ function Controller(scene, startParticles, endParticles) {
           loader.load('./objs/' + startObjName + '.obj', 
           function(object) {
               scene.add(object);
+            //   var vs = getVerticesObj3d(object)
+            //   console.log(dijkstra(vs, vs[2], vs[600]));
               _this.initObjParticles(_this.startParticles, object);
           }, 
           inProgressCallback, 
