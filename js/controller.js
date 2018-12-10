@@ -73,10 +73,10 @@ Controller.prototype.handleCameraChange = function(cameraType) {
     var cam = null;
     if (cameraType == CameraTypes.ORTHOGRAPHIC) {
         cam = new THREE.OrthographicCamera(WIDTH/-2, WIDTH/2, HEIGHT/2, HEIGHT/-2, 1, 1000);
-        cam.position.set(0, 0, 100);
+        cam.position.set(0, 10, 100);
     } else {
         cam = new THREE.PerspectiveCamera(140, WIDTH/HEIGHT, 1, 1000);
-        cam.position.set( 0, 0, 50);
+        cam.position.set( 0, 80, 80);
     }
     this.startParticles.camera = cam;
     this.endParticles.camera = cam;
@@ -121,6 +121,13 @@ Controller.prototype.changeText = function(particles, newText) {
 }
 
 Controller.prototype.startTransport = function () {
+    this.cameraControls.autoRotate = true;
+    if (this.startParticles.particles) {
+        this.startParticles.particles.renderOrder = 5
+    }
+    if (this.endParticles.particles) {
+        this.endParticles.particles.renderOrder = 4
+    }
     var startPoints = this.startParticles.getPoints();
     var endPoints = this.endParticles.getPoints();
     this.handleForce();
@@ -148,11 +155,11 @@ Controller.prototype.initObjParticles = function (particles, obj) {
         this.displayGeodesicPath(particles, obj);
         return;
     } else if (particles == this.startParticles) {
-        translateGeometryObj3d(obj, -50, 0, 0);
+        translateGeometryObj3d(obj, -40, 0, 0);
         particles.setColor(new THREE.Color(Colors.RED));
     }
     else {
-        translateGeometryObj3d(obj, 50, 0, 0);
+        translateGeometryObj3d(obj, 40, 0, 0);
         particles.setColor(new THREE.Color(Colors.BLUE));
     }
     particles.setSize(1)

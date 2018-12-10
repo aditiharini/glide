@@ -43,7 +43,7 @@ $(document).ready(function() {
     // camera = new THREE.OrthographicCamera(WIDTH/-2, WIDTH/2, HEIGHT/2, HEIGHT/-2, 1, 1000);
     // camera.position.set( 0.0, 0, 30);
     camera = new THREE.PerspectiveCamera(140, WIDTH/HEIGHT, 1, 1000);
-    camera.position.set( 0, 0, 50);
+    camera.position.set( 0, 80, 80);
     ambientLight = new THREE.AmbientLight(0xffffff);
     scene.add(ambientLight);
     renderer = new THREE.WebGLRenderer();
